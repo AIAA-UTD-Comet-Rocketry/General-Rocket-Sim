@@ -368,3 +368,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](https://gi
 Want to know which bugs have been fixed and the new features of each version? Check out the [release notes](https://github.com/RocketPy-Team/RocketPy/releases).
 # Airbrakes25-26
 Airbrake Dev for the 2025-2026 school year
+# General-Rocket-Sim
+Prior Rocket sims
