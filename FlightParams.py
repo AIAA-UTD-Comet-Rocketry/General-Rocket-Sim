@@ -3,6 +3,7 @@ from rocketpy.mathutils.function import Function
 from rocketpy.motors import motor
 import numpy as np
 import pandas as pd
+import bisect
 
 # HERE ARE THE VARIABLES YOU WILL HAVE TO CHANGE
 
@@ -136,12 +137,40 @@ def getPitch(q):
 lookupTable = "./lookuptable.csv"
 table = pd.read_csv(lookupTable)
 
+numAngles = 6
+
+totalVelocities = table.shape[1] / numAngles
+totalAltitudes = table.shape[0] 
+
+angleVals = [90, 85, 80, 75, 70, 65]
+
+def closerIndex(arr, val, smallerIndex, largerIndex):
+    distI = val - smallerIndex
+    distJ = largerIndex - val
+    return smallerIndex if distI < distJ else largerIndex
+
+# binary searches to find ideal index
+def binarySearch(arr, val, i, j):
+    # if down to last two elements, take closest one instead
+    if(i + 1 == j):
+        return closerIndex(arr, val, i, j)
+
+    midIndex = (j + i) // 2
+
+    # typical binary search activities
+    if(arr[midIndex] == val):
+        return midIndex
+    elif(val > arr[midIndex]):
+        return binarySearch(arr, val, midIndex, j)
+    else:
+        return binarySearch(arr, val, i, midIndex)
+    pass
+
 # airbrake_deploy_altitude = 2000
 def airbrake_controller_function(time, sampling_rate, state, state_history, observed_variables, air_brakes, env):
     canDeployAirbrake = False
 
     deployment_time = air_brakes.airbrake_deploy_time
-
 
     # state = [x, y, z, vx, vy, vz, e0, e1, e2, e3, wx, wy, wz]
     altitude_ASL = state[2]
@@ -174,6 +203,16 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
     pitch = getPitch(np.array([e0, e1, e2, e3]))  # ~15° rotation around Y
 
     print("Angle from flat plane (deg):", pitch)
+
+    # ALTITUDES IS COLUMN, VELCOITIES IS ROWS
+
+
+    # gets closest index to this angle
+    angleIndex = binarySearch(angleVals, pitch, 0, len(angleVals) - 1)
+
+    
+
+
 
     # Check if the rocket has reached burnout
     if (time > burn_time and vy > 0):
