@@ -137,12 +137,14 @@ def getPitch(q):
 lookupTable = "./lookuptable.csv"
 table = pd.read_csv(lookupTable)
 
-numAngles = 6
-
-totalVelocities = table.shape[1] / numAngles
-totalAltitudes = table.shape[0] 
 
 angleVals = [90, 85, 80, 75, 70, 65]
+velocityVals = [5, 6, 7, 8, 9, 10]
+altitudeVals = [20, 30, 40, 50, 60]
+
+numAngles = len(angleVals)
+numVelocities = len(velocityVals)
+numAltitudes = len(altitudeVals)
 
 def closerIndex(arr, val, smallerIndex, largerIndex):
     distI = val - smallerIndex
@@ -208,15 +210,19 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
 
 
     # gets closest index to this angle
-    angleIndex = binarySearch(angleVals, pitch, 0, len(angleVals) - 1)
+    angleIndex = binarySearch(angleVals, pitch, 0, numAngles - 1)
+    velocityIndex = binarySearch(velocityVals, vy, 0, numVelocities - 1)
+    altitudeIndex = binarySearch(altitudeVals, above_ground_altitude, 0, numAltitudes - 1)
 
-    
+    deploymentLevel = table.iloc[angleIndex * numAltitudes + velocityIndex][altitudeIndex]
+
+
 
 
 
     # Check if the rocket has reached burnout
     if (time > burn_time and vy > 0):
-        air_brakes.deployment_level = 1
+        air_brakes.deployment_level = deploymentLevel
         canDeployAirbrake = True
         print("WE CAN DEPLOY!")
     
