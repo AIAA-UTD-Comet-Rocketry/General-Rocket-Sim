@@ -95,7 +95,7 @@ rail_length = 4.1416
 
 #airbrakes
 air_brake_drag_file = "ReferencedFiles/AirbrakeDrag.csv"
-airbrake_sample_rate = 1 # 1 herz, so every .1 seconds
+airbrake_sample_rate = 100 # 1 herz, so every .1 seconds
 airbrake_clamp = True
 override_rocketdrag_with_airbrakedrag = True
 airbrake_area = 2 # in meters
@@ -129,27 +129,46 @@ def getPitch(q):
     # Angle from flat plane (XY plane)
     theta = np.arccos(np.clip(obj_up[2], -1.0, 1.0))  # radians
     pitch = np.degrees(theta)
-    return pitch
+    return 90 - pitch
 
 # note: when getting our csv, check it against min and max values. 
-# altitude is row, velocity column
+# altitude is column, velocity row
 
-lookupTable = "./lookuptable.csv"
-table = pd.read_csv(lookupTable)
+lookupTable = "./FinalLookupTable.csv"
+table = pd.read_csv(lookupTable, header=None)
+
+# vel range is 0, 275
+
+# alt range is X, 3048
+
+minAlt = 2500
+maxAlt = 3048
+
+minVel = 0
+maxVel = 275
+
+
 
 
 angleVals = [90, 85, 80, 75, 70, 65]
-velocityVals = [5, 6, 7, 8, 9, 10]
-altitudeVals = [20, 30, 40, 50, 60]
+
+numVelPoints = 100
+numAltPoints = 100
+
+velIncrementAmount = (maxVel - minVel) / (numVelPoints - 1)
+altIncrementAmount = (maxAlt - minAlt) / (numAltPoints - 1)
+
+velocityVals = [vel for vel in np.arange(minVel, maxVel + 1, velIncrementAmount)]
+altitudeVals = np.arange(minAlt, maxAlt + 1, altIncrementAmount)
 
 numAngles = len(angleVals)
 numVelocities = len(velocityVals)
 numAltitudes = len(altitudeVals)
 
 def closerIndex(arr, val, smallerIndex, largerIndex):
-    distI = val - smallerIndex
-    distJ = largerIndex - val
-    return smallerIndex if distI < distJ else largerIndex
+    distI = val - arr[smallerIndex]
+    distJ = arr[largerIndex] - val
+    return (smallerIndex if distI < distJ else largerIndex)
 
 # binary searches to find ideal index
 def binarySearch(arr, val, i, j):
@@ -166,13 +185,12 @@ def binarySearch(arr, val, i, j):
         return binarySearch(arr, val, midIndex, j)
     else:
         return binarySearch(arr, val, i, midIndex)
-    pass
 
 # airbrake_deploy_altitude = 2000
 def airbrake_controller_function(time, sampling_rate, state, state_history, observed_variables, air_brakes, env):
     canDeployAirbrake = False
 
-    deployment_time = air_brakes.airbrake_deploy_time
+    # deployment_time = air_brakes.airbrake_deploy_time
 
     # state = [x, y, z, vx, vy, vz, e0, e1, e2, e3, wx, wy, wz]
     altitude_ASL = state[2]
@@ -211,20 +229,28 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
 
     # gets closest index to this angle
     angleIndex = binarySearch(angleVals, pitch, 0, numAngles - 1)
-    velocityIndex = binarySearch(velocityVals, vy, 0, numVelocities - 1)
+    velocityIndex = binarySearch(velocityVals, vz, 0, numVelocities - 1)
     altitudeIndex = binarySearch(altitudeVals, above_ground_altitude, 0, numAltitudes - 1)
 
-    deploymentLevel = table.iloc[angleIndex * numAltitudes + velocityIndex][altitudeIndex]
+    altitudeIndex = len(altitudeVals) - altitudeIndex - 1
+
+    print(f"The goddamn altitude: {above_ground_altitude}")
+    print(f"The index is: {altitudeIndex}")
+    print("Altitude array:")
+    print(altitudeVals)
+
+    deploymentLevel = table.iloc[angleIndex * numVelocities + velocityIndex][altitudeIndex]
 
 
+    print(f"Our aaltitude was {above_ground_altitude}, our velocity Y was {vz}, our angle was {pitch}")
 
 
 
     # Check if the rocket has reached burnout
-    if (time > burn_time and vy > 0):
+    if (vy > 0 and time > burn_time):
         air_brakes.deployment_level = deploymentLevel
         canDeployAirbrake = True
-        print("WE CAN DEPLOY!")
+        print(f"WE CAN DEPLOY! Deployment level is {deploymentLevel}")
     
     return (
         "airbrake" + str(canDeployAirbrake),

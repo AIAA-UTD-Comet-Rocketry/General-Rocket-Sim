@@ -72,6 +72,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
         if(setting["time_to_deploy_airbrake_after_burnout"] != -1):
             Sp25.add_air_brakes(
                 drag_coefficient_curve= FlightParams.air_brake_drag_file,
+                # drag_coefficient_curve= 1,
                 controller_function= FlightParams.airbrake_controller_function,
                 sampling_rate= FlightParams.airbrake_sample_rate,
                 reference_area = FlightParams.airbrake_area,
@@ -112,6 +113,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
                 rocket=Sp25, environment=env,rail_length = FlightParams.rail_length,inclination = setting["inclination"],
                 heading=setting["heading"], terminate_on_apogee = termOnApogee
             )
+            testFlight.info()
             inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env)
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])
