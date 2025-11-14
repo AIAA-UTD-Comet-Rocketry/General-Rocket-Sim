@@ -3,7 +3,6 @@ from rocketpy.mathutils.function import Function
 from rocketpy.motors import motor
 import numpy as np
 import pandas as pd
-import bisect
 
 # HERE ARE THE VARIABLES YOU WILL HAVE TO CHANGE
 
@@ -20,8 +19,8 @@ longitude = -103.532806
 generatedFilesLocation ="IrecSims/"
 
 #motor
-propellant_mass = 10.476-5.578
 dryMotorMass = 5.578
+propellant_mass = 10.476-dryMotorMass
 grainInnerRadius = .02921/2
 grainOuterRadius = .0806/2
 grainHeight = 0.12488164
@@ -103,6 +102,47 @@ airbrake_area = 2 # in meters
 
 halfway_to_target = 1524
 
+lookupTable = "./ReferencedFiles/FinalLookupTable.csv"
+
+# vel range is 0, 275
+
+# alt range is X, 3048
+
+minAlt = 2500
+maxAlt = 3048
+
+minVel = 0
+maxVel = 275
+
+# angleVals = [90, 85, 80, 75, 70, 65]
+angleVals = [65, 70, 75, 80, 85, 90]
+
+# HERE ARE THE VARIABLES YOU DON'T HAVE TO CHANGE
+totalMotorMass = dryMotorMass + propellant_mass
+totalHeight = grainHeight * numGrains
+# area = pi * r^2 * height
+motor_volume = (((np.pi * grainOuterRadius ** 2) - (np.pi * grainInnerRadius ** 2)) * totalHeight)
+motor_11_inertia = (1/12)*dryMotorMass*(grainOuterRadius)**2
+motor_density = propellant_mass/motor_volume
+motor_33_inertia = ((1/4)*dryMotorMass*(grainOuterRadius)**2) + (1/12)*dryMotorMass*(motorLength)**2
+the_motor_position = spLength + nose_cone_length + grainHeight/2 - (totalHeight)/2
+the_motor_center_of_dry_mass_position = the_motor_position
+
+_, _, points = motor.Motor.import_eng("ReferencedFiles/" + motor_thrust_file)
+thrust_source = points
+interpolation_method = "linear"
+thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
+impulse = thrust.integral(0, burn_time)*2.5
+
+spCentralAxis = (spRadius**2)*spMass*1/2
+spCentralDiameter = ((1/4)*spMass*(spRadius)**2) + (1/12)*spMass*(spLength)**2
+rocket_center_of_dry_mass_position = (the_center_of_mass_without_motor * spMass + the_motor_center_of_dry_mass_position * dryMotorMass) / (dryMotorMass + spMass)
+
+power_off = 1
+power_on = 1
+kelvin_temp = (fahrenheit_temp - 32) * 5/9 + 273.15
+nose_position = 0
+
 def getPitch(q):
     def quat_conjugate(q):
         w, x, y, z = q
@@ -135,24 +175,7 @@ def getPitch(q):
 # note: when getting our csv, check it against min and max values. 
 # altitude is column, velocity row
 
-lookupTable = "./ReferencedFiles/FinalLookupTable.csv"
 table = pd.read_csv(lookupTable, header=None)
-
-# vel range is 0, 275
-
-# alt range is X, 3048
-
-minAlt = 2500
-maxAlt = 3048
-
-minVel = 0
-maxVel = 275
-
-
-
-
-# angleVals = [90, 85, 80, 75, 70, 65]
-angleVals = [65, 70, 75, 80, 85, 90]
 
 numVelPoints = int(table.shape[0] / len(angleVals))
 numAltPoints = table.shape[1]
@@ -263,33 +286,3 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
         air_brakes.deployment_level,
         air_brakes.drag_coefficient(air_brakes.deployment_level, mach_number),
     )
-
-
-
-
-
-# HERE ARE THE VARIABLES YOU DON'T HAVE TO CHANGE
-totalMotorMass = dryMotorMass + propellant_mass
-totalHeight = grainHeight * numGrains
-# area = pi * r^2 * height
-motor_volume = (((np.pi * grainOuterRadius ** 2) - (np.pi * grainInnerRadius ** 2)) * totalHeight)
-motor_11_inertia = (1/12)*dryMotorMass*(grainOuterRadius)**2
-motor_density = propellant_mass/motor_volume
-motor_33_inertia = ((1/4)*dryMotorMass*(grainOuterRadius)**2) + (1/12)*dryMotorMass*(motorLength)**2
-the_motor_position = spLength + nose_cone_length + grainHeight/2 - (totalHeight)/2
-the_motor_center_of_dry_mass_position = the_motor_position
-
-_, _, points = motor.Motor.import_eng("ReferencedFiles/" + motor_thrust_file)
-thrust_source = points
-interpolation_method = "linear"
-thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
-impulse = thrust.integral(0, burn_time)*2.5
-
-spCentralAxis = (spRadius**2)*spMass*1/2
-spCentralDiameter = ((1/4)*spMass*(spRadius)**2) + (1/12)*spMass*(spLength)**2
-rocket_center_of_dry_mass_position = (the_center_of_mass_without_motor * spMass + the_motor_center_of_dry_mass_position * dryMotorMass) / (dryMotorMass + spMass)
-
-power_off = 1
-power_on = 1
-kelvin_temp = (fahrenheit_temp - 32) * 5/9 + 273.15
-nose_position = 0

@@ -65,7 +65,7 @@ class XMLComponent(ABC):
                 all_fields.extend(cls._FIELDS)
 
         for attr_name, path, converter, default in all_fields:
-            self._parse_and_set_attr(attr_name, path, converter, default, tag)
+            self._parse_and_set_attr(attr_name, path, converter, default, self.tag)
 
     def _parse_and_set_attr(self, attr_name, path, converter, default, elemName):
         if(attr_name == "position"):
@@ -73,6 +73,18 @@ class XMLComponent(ABC):
             posType = actualElement.attrib.get("type")
             if(posType is not None):
                 setattr(self, f"{elemName}_positionType", posType)
+        if(attr_name == "motorconfiguration"):
+            actualElement = self.element.find(path)
+            isDefault = actualElement.attrib.get("default")
+            motorId = actualElement.atrib.get("configid")
+            if(isDefault is not None and motorId is not None):
+                setattr(self, f"{elemName}_isDefaultMotor", isDefault)
+                setattr(self, f"{elemName}_motorIDConfig", motorId)
+        if(attr_name == "motor"):
+            actualElement = self.element.find(path)
+            id = actualElement.attrib.get("configid")
+            if id is not None:
+                setattr(self, "id", id)
         
         """Finds text in XML, converts it, and sets it as an attribute."""
         raw_value = self.element.findtext(path)
@@ -246,7 +258,21 @@ class RailButton(Subcomponent):
             f"rail_{self.rail_id}_positionType": self.railbutton_positionType,
             f"rail_{self.rail_id}_angle": self.angleoffset
         }
+    
+@register_component('motorconfiguration')
+class MotorConfig(Subcomponent):
+    _FIELDS = [
+        ('configid', './/configid', str, "None"),
+    ]
 
+    def getDictVals(self) -> dict:        
+        if hasattr(self, "motorconfiguration_isDefaultMotor"):
+            return {
+                "motor_config_id": self.motorconfiguration_motorIDConfig,
+            }
+        else:
+            return {}
+        
 @register_component('masscomponent')
 class MassComponent(Subcomponent):
     _FIELDS = [

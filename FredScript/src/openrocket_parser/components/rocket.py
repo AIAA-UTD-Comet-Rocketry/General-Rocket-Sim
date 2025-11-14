@@ -31,5 +31,7 @@ class Rocket(XMLComponent):
 
         self.stages = [component_factory(e) for e in self.findall('.//stage')]
 
+        self.stages.extend([component_factory(e) for e in self.findall('.//motorconfiguration')])
+
         for stage in self.stages:
             self.rocketpyElems.update(stage.getDictVals())

@@ -3,7 +3,7 @@ NoseCone functionality for generic nosecones. Each shape of nosecone may extend 
 to read completely different fields
 """
 
-from openrocket_parser.components.components import register_component, Subcomponent
+from openrocket_parser.components.components import XMLComponent, register_component, Subcomponent
 
 
 @register_component('nosecone')
@@ -13,11 +13,12 @@ class NoseCone(Subcomponent):
     """
     _FIELDS = [
         ('shape', './/shape', str, 'ogive'),
+        ('length', '../length', XMLComponent.get_float, 0)
     ]
 
     def getDictVals(self) -> dict:
         return {
-            "nose_shape": self.shape
-
+            "nose_shape": self.shape,
+            "nose_length": self.length
         }
 
