@@ -13,8 +13,8 @@ class Stage(XMLComponent):
     """
     Stage component, created after the stage components in the xml
     """
-    def __init__(self, element: Element):
-        super().__init__(element)
+    def __init__(self, element: Element, parent):
+        super().__init__(element, parent)
         self.subcomponents: List[XMLComponent] = [
-            component_factory(e) for e in self.element
+            component_factory(e, element) for e in self.element
         ]

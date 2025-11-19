@@ -39,7 +39,7 @@ def load_rocket_from_xml_safe(file_path: str, root_ele: str = 'rocket') -> Optio
         if rocket_element is None:
             raise ValueError("Could not find a <rocket> element in the XML file.")
 
-        return Rocket(rocket_element)
+        return Rocket(rocket_element, None)
     except FileNotFoundError:
         logging.error(f"XML file not found at path: {file_path}")
         return None

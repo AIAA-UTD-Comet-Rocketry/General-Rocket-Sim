@@ -23,11 +23,11 @@ class BodyTube(Subcomponent):
 
 
     motormount = None
-    def __init__(self, element: Element):
-        super().__init__(element)
+    def __init__(self, element: Element, parent):
+        super().__init__(element, parent)
         motor_mount_element = self.element.find('.//motormount')
         if motor_mount_element is not None:
-            self.motormount = component_factory(motor_mount_element)
+            self.motormount = component_factory(motor_mount_element, element)
 
     def getDictVals(self) -> dict:
         return {

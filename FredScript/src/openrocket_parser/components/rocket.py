@@ -25,13 +25,16 @@ class Rocket(XMLComponent):
     ]
 
 
-    def __init__(self, element: Element):
+    def __init__(self, element: Element, parent):
         self.rocketpyElems = {}
-        super().__init__(element)
+        super().__init__(element, parent)
 
-        self.stages = [component_factory(e) for e in self.findall('.//stage')]
+        self.stages = [component_factory(e, element) for e in self.findall('.//stage')]
 
-        self.stages.extend([component_factory(e) for e in self.findall('.//motorconfiguration')])
+        self.stages.extend([component_factory(e, element) for e in self.findall('.//motorconfiguration')])
 
         for stage in self.stages:
             self.rocketpyElems.update(stage.getDictVals())
+
+    def getDictVals(self) -> dict:
+        return {}

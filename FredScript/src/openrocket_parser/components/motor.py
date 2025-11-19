@@ -39,9 +39,9 @@ class MotorMount(XMLComponent):
         ('length', './/length', XMLComponent.get_float, 0.0),
     ]
 
-    def __init__(self, element: Element):
-        super().__init__(element)
-        self.motors = [component_factory(e) for e in self.findall('.//motor')]
+    def __init__(self, element: Element, parent):
+        super().__init__(element, parent)
+        self.motors = [component_factory(e, element) for e in self.findall('.//motor')]
         if(len(self.motors > 1)):
             print("ATTENTION: THERE ARE MULTIPLE MOTORS! Thus, the dictionary mapping the right values may only pick one of the motors! Please change your openrocket to only contain one motor. Or don't, we'll handle it still by selecting whichever was labeled as the current one!")
 

@@ -19,7 +19,7 @@ def register_component(tag_name: str):
     return decorator
 
 
-def component_factory(element: Element) -> 'XMLComponent':
+def component_factory(element: Element, parent) -> 'XMLComponent':
     """Creates a component instance based on the XML element's tag."""
     tag = element.tag
     component_class = COMPONENT_REGISTRY.get(tag)
@@ -30,14 +30,15 @@ def component_factory(element: Element) -> 'XMLComponent':
     print(f"Component class is {component_class}")
 
     if component_class:
-        return component_class(element)
+        return component_class(element, parent)
 
     print(f"No specific class found for tag '{tag}'. Using default Subcomponent.")
     # Fallback to a generic component if the tag is not recognized.
-    return Subcomponent(element)
+    return Subcomponent(element, parent)
 
 
 class XMLComponent(ABC):
+    bodyTubeNumbah = 0
     """
     An improved base class for all XML-based components.
 
@@ -52,11 +53,12 @@ class XMLComponent(ABC):
         ('configid', './/configid', str, None),
     ]
 
-    def __init__(self, element: Element):
+    def __init__(self, element: Element, parent):
         if element is None:
             raise ValueError("Cannot initialize XMLComponent with a None element.")
         self.element: Element = element
         self.tag: str = element.tag
+        self.parent = parent
 
         # Automatically parse all fields defined in the class hierarchy
         all_fields = []
@@ -85,7 +87,16 @@ class XMLComponent(ABC):
             id = actualElement.attrib.get("configid")
             if id is not None:
                 setattr(self, "id", id)
-        
+        if(elemName == "bodytube"):
+            actualElement = self.element.find(path)
+            id = actualElement.atrib.get("id")
+            setattr(self, f"bbodyTube_{id}_Number", bodyTubeNumbah)
+            bodyTubeNumbah += 1
+        if(elemName == "trapezoidfinset"):
+            parentId = self.parent.get("id")            
+            if parentId is not None:
+                setattr(self, "finsParentId", parentId)
+
         """Finds text in XML, converts it, and sets it as an attribute."""
         raw_value = self.element.findtext(path)
         if raw_value is not None:
@@ -143,10 +154,10 @@ class Subcomponent(XMLComponent):
         ('innerradius', './/innerradius', XMLComponent.get_float, 0.0),
     ]
 
-    def __init__(self, element: Element):
-        super().__init__(element)
+    def __init__(self, element: Element, parent):
+        super().__init__(element, parent)
         self.subcomponents: List[XMLComponent] = [
-            component_factory(e) for e in self.findall('.//subcomponents/*')
+            component_factory(e, element) for e in self.findall('.//subcomponents/*')
         ]
 
 @register_component('bulkhead')

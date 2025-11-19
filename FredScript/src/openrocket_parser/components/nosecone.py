@@ -13,7 +13,7 @@ class NoseCone(Subcomponent):
     """
     _FIELDS = [
         ('shape', './/shape', str, 'ogive'),
-        ('length', '../length', XMLComponent.get_float, 0)
+        ('length', '../length', XMLComponent.get_float, 0),
         ('mass', '../overridemass', XMLComponent.get_float, 0)
     ]
 
