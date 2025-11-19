@@ -152,6 +152,7 @@ class Subcomponent(XMLComponent):
 @register_component('bulkhead')
 class Bulkhead(Subcomponent):
     _FIELDS = [
+        ('id', './/id', str, 'none'),
         ('instancecount', './/instancecount', int, 1),
         ('instanceseparation', './/instanceseparation', XMLComponent.get_float, 0.0),
         ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
@@ -165,9 +166,15 @@ class Bulkhead(Subcomponent):
         ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
     ]
 
+    def getDictVals(self) -> dict:
+        return {
+            f"bulkhead_{self.id}_mass": self.overridemass
+        }
+
 @register_component('shockcord')
 class ShockCord(Subcomponent):
     _FIELDS = [
+        ('id', './/id', str, 'none'),
         ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
         ('position', './/position', XMLComponent.get_float, 0.0),
         ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
@@ -179,6 +186,11 @@ class ShockCord(Subcomponent):
         ('cordlength', './/cordlength', XMLComponent.get_float, 0.0),
         ('material', './/material', str, 'Unknown'),
     ]
+
+    def getDictVals(self) -> dict:
+        return {
+            f"shockCord_{self.id}_mass": self.overridemass
+        }
 
 @register_component('tubecoupler')
 class TubeCoupler(Subcomponent):
@@ -193,11 +205,18 @@ class TubeCoupler(Subcomponent):
         ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
         ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
         ('thickness', './/thickness', XMLComponent.get_float, 0.0),
+        ('id', './/id', str, 'none'),
     ]
+
+    def getDictVals(self) -> dict:
+        return {
+            f"coupler_{self.id}_mass": self.overridemass,
+        }
 
 @register_component('parachute')
 class Parachute(Subcomponent):
     _FIELDS = [
+        ('id', './/id', str, 'none'),
         ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
         ('position', './/position', XMLComponent.get_float, 0.0),
         ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
@@ -226,7 +245,8 @@ class Parachute(Subcomponent):
         return {
             "parachute_cd": self.cd,
             "parachute_trigger": triggerVal,
-            "parachute_lag": self.deploydelay
+            "parachute_lag": self.deploydelay,
+            f"parachute_{self.id}_mass": self.overridemass
         }
     
 
@@ -256,7 +276,8 @@ class RailButton(Subcomponent):
             "rail_id": self.rail_id,
             f"rail_{self.rail_id}_position": self.position,
             f"rail_{self.rail_id}_positionType": self.railbutton_positionType,
-            f"rail_{self.rail_id}_angle": self.angleoffset
+            f"rail_{self.rail_id}_angle": self.angleoffset,
+            f"rail_{self.rail_id}_mass": self.overridemass
         }
     
 @register_component('motorconfiguration')
@@ -276,6 +297,7 @@ class MotorConfig(Subcomponent):
 @register_component('masscomponent')
 class MassComponent(Subcomponent):
     _FIELDS = [
+        ('id', './/id', str, "-1"),
         ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
         ('position', './/position', XMLComponent.get_float, 0.0),
         ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
@@ -288,9 +310,15 @@ class MassComponent(Subcomponent):
         ('masscomponenttype', './/masscomponenttype', str, 'masscomponent'),
     ]
 
+    def getDictVals(self) -> dict:        
+        return {
+                f"addedMass_{self.id}": self.overridemass,
+            }
+
 @register_component('innertube')
 class InnerTube(Subcomponent):
     _FIELDS = [
+        ('id', './/id', str, "-1"),
         ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
         ('position', './/position', XMLComponent.get_float, 0.0),
         ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
@@ -305,6 +333,11 @@ class InnerTube(Subcomponent):
         ('clusterscale', './/clusterscale', XMLComponent.get_float, 1.0),
         ('clusterrotation', './/clusterrotation', XMLComponent.get_float, 0.0),
     ]
+
+    def getDictVals(self) -> dict:        
+        return {
+                f"innerTube_{self.id}_mass": self.overridemass
+            }
 
 @register_component('trapezoidfinset')
 class TrapezoidFinSet(Subcomponent):
@@ -344,12 +377,14 @@ class TrapezoidFinSet(Subcomponent):
             "root_chord": self.rootchord,
             "tip_chord": self.tipchord,
             "fin_height": self.height,
-            "position_version": self.trapezoidfinset_positionType
+            "position_version": self.trapezoidfinset_positionType,
+            "fin_mass": self.overridemass
         }
 
 @register_component('centeringring')
 class CenteringRing(Subcomponent):
     _FIELDS = [
+         ('id', './/id', str, "-1"),
         ('instancecount', './/instancecount', int, 1),
         ('instanceseparation', './/instanceseparation', XMLComponent.get_float, 0.0),
         ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
@@ -363,3 +398,8 @@ class CenteringRing(Subcomponent):
         ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
         ('innerradius', './/innerradius', XMLComponent.get_float, 0.0),
     ]
+
+    def getDictVals(self) -> dict:
+        return {
+            f"centeringRing_{self.id}_mass": self.overridemass
+        }    

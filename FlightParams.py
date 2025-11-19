@@ -117,7 +117,16 @@ maxVel = 275
 # angleVals = [90, 85, 80, 75, 70, 65]
 angleVals = [65, 70, 75, 80, 85, 90]
 
+
+
+
+
+
 # HERE ARE THE VARIABLES YOU DON'T HAVE TO CHANGE
+
+
+
+
 totalMotorMass = dryMotorMass + propellant_mass
 totalHeight = grainHeight * numGrains
 # area = pi * r^2 * height

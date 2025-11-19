@@ -17,7 +17,8 @@ class BodyTube(Subcomponent):
     """
     _FIELDS = [
         ('id', './/id', str, 'none'),
-        ('length', '../length', XMLComponent.get_float, 0)
+        ('length', '../length', XMLComponent.get_float, 0),
+        ('mass', '../overridemass', XMLComponent.get_float, 0)
     ]
 
 
@@ -31,5 +32,7 @@ class BodyTube(Subcomponent):
     def getDictVals(self) -> dict:
         return {
             "rocket_radius": self.radius,
-            f"section_{self.id}_length": self.length
+            f"bodyTube_{self.id}_length": self.length,
+            f"bodyTube_{self.id}_mass": self.mass,
+            f"bodyTube_{self.id}_length": self.length
         }

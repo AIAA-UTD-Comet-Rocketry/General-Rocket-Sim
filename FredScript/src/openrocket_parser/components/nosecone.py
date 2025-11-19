@@ -14,11 +14,13 @@ class NoseCone(Subcomponent):
     _FIELDS = [
         ('shape', './/shape', str, 'ogive'),
         ('length', '../length', XMLComponent.get_float, 0)
+        ('mass', '../overridemass', XMLComponent.get_float, 0)
     ]
 
     def getDictVals(self) -> dict:
         return {
             "nose_shape": self.shape,
-            "nose_length": self.length
+            "nose_length": self.length,
+            "nose_mass": self.mass
         }
 
