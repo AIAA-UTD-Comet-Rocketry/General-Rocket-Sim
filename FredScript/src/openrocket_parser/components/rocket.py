@@ -29,12 +29,24 @@ class Rocket(XMLComponent):
         self.rocketpyElems = {}
         super().__init__(element, parent)
 
-        self.stages = [component_factory(e, element) for e in self.findall('.//stage')]
+        self.stages = [component_factory(e, element) for e in self.findall('.//stage//')]
 
         self.stages.extend([component_factory(e, element) for e in self.findall('.//motorconfiguration')])
 
+        tagSet = [e.tag for e in self.findall('.//stage//')]
+        
+        tagSet.extend([e.tag for e in self.findall('.//motorconfiguration')])
+
+        print("IMAGES ARE:")
+        print(tagSet)
+
         for stage in self.stages:
-            self.rocketpyElems.update(stage.getDictVals())
+            if stage is None:
+                print(f"THEY THIS ELEMENT DOESN'T EXIST! IT IS: {stage}")
+            else:
+                print(f"Element is: {stage.element}")
+                self.rocketpyElems.update(stage.getDictVals())
+                print(f"The elements at this stage are: {stage.getDictVals()}")
 
     def getDictVals(self) -> dict:
         return {}

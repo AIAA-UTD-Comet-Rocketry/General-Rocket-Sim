@@ -18,3 +18,10 @@ class Stage(XMLComponent):
         self.subcomponents: List[XMLComponent] = [
             component_factory(e, element) for e in self.element
         ]
+    
+    def getDictVals(self) -> dict:
+        returnDict = {}
+        # for subcomponent in self.subcomponents:
+        #     print(f"Current component is: {subcomponent}")
+        #     returnDict.update(subcomponent.getDictVals())
+        return returnDict

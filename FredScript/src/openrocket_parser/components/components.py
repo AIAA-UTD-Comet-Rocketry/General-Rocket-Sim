@@ -33,6 +33,8 @@ def component_factory(element: Element, parent) -> 'XMLComponent':
         return component_class(element, parent)
 
     print(f"No specific class found for tag '{tag}'. Using default Subcomponent.")
+    if(tag == "name" or tag == "id"):
+        return None
     # Fallback to a generic component if the tag is not recognized.
     return Subcomponent(element, parent)
 
@@ -48,9 +50,9 @@ class XMLComponent(ABC):
     # Define fields to be parsed from XML.
     # Format: ('attribute_name', 'xml_path', type_conversion_function, default_value)
     _FIELDS = [
-        ('name', './/name', str, lambda e: e.tag),  # Use a lambda for dynamic default
-        ('id', './/id', str, None),
-        ('configid', './/configid', str, None),
+        ('name', './name', str, lambda e: e.tag),  # Use a lambda for dynamic default
+        ('id', './id', str, None),
+        ('configid', './configid', str, None),
     ]
 
     def __init__(self, element: Element, parent):
@@ -67,32 +69,38 @@ class XMLComponent(ABC):
                 all_fields.extend(cls._FIELDS)
 
         for attr_name, path, converter, default in all_fields:
+            print(f"Also the tag is {self.tag} and the element is {self.element} and the path is {path}")
             self._parse_and_set_attr(attr_name, path, converter, default, self.tag)
 
     def _parse_and_set_attr(self, attr_name, path, converter, default, elemName):
         if(attr_name == "position"):
             actualElement = self.element.find(path)
+            if actualElement is None:
+                print(f"Couldn't find attribute! The path was {path}, the actual element name is {elemName}, and the parent is {self.parent}")
+                return
             posType = actualElement.attrib.get("type")
             if(posType is not None):
                 setattr(self, f"{elemName}_positionType", posType)
-        if(attr_name == "motorconfiguration"):
+        elif(attr_name == "motorconfiguration"):
             actualElement = self.element.find(path)
             isDefault = actualElement.attrib.get("default")
-            motorId = actualElement.atrib.get("configid")
+            motorId = actualElement.attrib.get("configid")
             if(isDefault is not None and motorId is not None):
                 setattr(self, f"{elemName}_isDefaultMotor", isDefault)
                 setattr(self, f"{elemName}_motorIDConfig", motorId)
-        if(attr_name == "motor"):
+        elif(attr_name == "motor"):
             actualElement = self.element.find(path)
             id = actualElement.attrib.get("configid")
             if id is not None:
                 setattr(self, "id", id)
-        if(elemName == "bodytube"):
-            actualElement = self.element.find(path)
-            id = actualElement.atrib.get("id")
-            setattr(self, f"bbodyTube_{id}_Number", bodyTubeNumbah)
-            bodyTubeNumbah += 1
-        if(elemName == "trapezoidfinset"):
+        elif(elemName == "bodytube"):
+            if(path != "./configid" and path != "./innerradius" and path != "./length" and path != "./outerradius"):
+                print(f"Bodytube path is {path}, attribute name is {attr_name}")
+                actualElement = self.element.find(path)
+                id = actualElement.attrib.get("id")
+                setattr(self, f"bbodyTube_{id}_Number", XMLComponent.bodyTubeNumbah)
+                XMLComponent.bodyTubeNumbah += 1
+        elif(elemName == "trapezoidfinset"):
             parentId = self.parent.get("id")            
             if parentId is not None:
                 setattr(self, "finsParentId", parentId)
@@ -145,36 +153,39 @@ class Subcomponent(XMLComponent):
     Subcomponents enables shared functionality for all components - such as length, radius, material, etc
     """
     _FIELDS = [
-        ('length', './/length', XMLComponent.get_float, 0.0),
-        ('radius', './/radius', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('material', './/material', str, 'Unknown'),
-        ('thickness', './/thickness', XMLComponent.get_float, 0.0),
-        ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
-        ('innerradius', './/innerradius', XMLComponent.get_float, 0.0),
+        ('length', './length', XMLComponent.get_float, 0.0),
+        ('radius', './radius', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('material', './material', str, 'Unknown'),
+        ('thickness', './thickness', XMLComponent.get_float, 0.0),
+        ('outerradius', './outerradius', XMLComponent.get_float, 0.0),
+        ('innerradius', './innerradius', XMLComponent.get_float, 0.0),
     ]
 
     def __init__(self, element: Element, parent):
         super().__init__(element, parent)
         self.subcomponents: List[XMLComponent] = [
-            component_factory(e, element) for e in self.findall('.//subcomponents/*')
+            component_factory(e, element) for e in self.findall('./subcomponents/*')
         ]
+
+    def getDictVals(self) -> dict:
+        return {}
 
 @register_component('bulkhead')
 class Bulkhead(Subcomponent):
     _FIELDS = [
-        ('id', './/id', str, 'none'),
-        ('instancecount', './/instancecount', int, 1),
-        ('instanceseparation', './/instanceseparation', XMLComponent.get_float, 0.0),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('material', './/material', str, 'Unknown'),
-        ('length', './/length', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
+        ('id', './id', str, 'none'),
+        ('instancecount', './instancecount', int, 1),
+        ('instanceseparation', './instanceseparation', XMLComponent.get_float, 0.0),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('material', './material', str, 'Unknown'),
+        ('length', './length', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('outerradius', './outerradius', XMLComponent.get_float, 0.0),
     ]
 
     def getDictVals(self) -> dict:
@@ -185,17 +196,17 @@ class Bulkhead(Subcomponent):
 @register_component('shockcord')
 class ShockCord(Subcomponent):
     _FIELDS = [
-        ('id', './/id', str, 'none'),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('packedlength', './/packedlength', XMLComponent.get_float, 0.0),
-        ('packedradius', './/packedradius', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('cordlength', './/cordlength', XMLComponent.get_float, 0.0),
-        ('material', './/material', str, 'Unknown'),
+        ('id', './id', str, 'none'),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('packedlength', './packedlength', XMLComponent.get_float, 0.0),
+        ('packedradius', './packedradius', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('cordlength', './cordlength', XMLComponent.get_float, 0.0),
+        ('material', './material', str, 'Unknown'),
     ]
 
     def getDictVals(self) -> dict:
@@ -206,17 +217,17 @@ class ShockCord(Subcomponent):
 @register_component('tubecoupler')
 class TubeCoupler(Subcomponent):
     _FIELDS = [
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('material', './/material', str, 'Unknown'),
-        ('length', './/length', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
-        ('thickness', './/thickness', XMLComponent.get_float, 0.0),
-        ('id', './/id', str, 'none'),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('material', './material', str, 'Unknown'),
+        ('length', './length', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('outerradius', './outerradius', XMLComponent.get_float, 0.0),
+        ('thickness', './thickness', XMLComponent.get_float, 0.0),
+        ('id', './id', str, 'none'),
     ]
 
     def getDictVals(self) -> dict:
@@ -227,24 +238,24 @@ class TubeCoupler(Subcomponent):
 @register_component('parachute')
 class Parachute(Subcomponent):
     _FIELDS = [
-        ('id', './/id', str, 'none'),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('packedlength', './/packedlength', XMLComponent.get_float, 0.0),
-        ('packedradius', './/packedradius', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('cd', './/cd', XMLComponent.get_float, 0.0),
-        ('material', './/material', str, 'Unknown'),
-        ('deployevent', './/deployevent', str, 'ejection'),
-        ('deployaltitude', './/deployaltitude', XMLComponent.get_float, 0.0),
-        ('deploydelay', './/deploydelay', XMLComponent.get_float, 0.0),
-        ('diameter', './/diameter', XMLComponent.get_float, 0.0),
-        ('linecount', './/linecount', int, 0),
-        ('linelength', './/linelength', XMLComponent.get_float, 0.0),
-        ('linematerial', './/linematerial', str, 'Unknown'),
+        ('id', './id', str, 'none'),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('packedlength', './packedlength', XMLComponent.get_float, 0.0),
+        ('packedradius', './packedradius', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('cd', './cd', XMLComponent.get_float, 0.0),
+        ('material', './material', str, 'Unknown'),
+        ('deployevent', './deployevent', str, 'ejection'),
+        ('deployaltitude', './deployaltitude', XMLComponent.get_float, 0.0),
+        ('deploydelay', './deploydelay', XMLComponent.get_float, 0.0),
+        ('diameter', './diameter', XMLComponent.get_float, 0.0),
+        ('linecount', './linecount', int, 0),
+        ('linelength', './linelength', XMLComponent.get_float, 0.0),
+        ('linematerial', './linematerial', str, 'Unknown'),
     ]
 
     def getDictVals(self) -> dict:
@@ -264,22 +275,22 @@ class Parachute(Subcomponent):
 @register_component('railbutton')
 class RailButton(Subcomponent):
     _FIELDS = [
-        ('instancecount', './/instancecount', int, 1),
-        ('instanceseparation', './/instanceseparation', XMLComponent.get_float, 0.0),
-        ('angleoffset', './/angleoffset', XMLComponent.get_float, 0.0),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('finish', './/finish', str, 'smooth'),
-        ('material', './/material', str, 'Unknown'),
-        ('outerdiameter', './/outerdiameter', XMLComponent.get_float, 0.0),
-        ('innerdiameter', './/innerdiameter', XMLComponent.get_float, 0.0),
-        ('height', './/height', XMLComponent.get_float, 0.0),
-        ('baseheight', './/baseheight', XMLComponent.get_float, 0.0),
-        ('flangeheight', './/flangeheight', XMLComponent.get_float, 0.0),
-        ('screwheight', './/screwheight', XMLComponent.get_float, 0.0),
-        ('rail_id', './/id', str, "-1")
+        ('instancecount', './instancecount', int, 1),
+        ('instanceseparation', './instanceseparation', XMLComponent.get_float, 0.0),
+        ('angleoffset', './angleoffset', XMLComponent.get_float, 0.0),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('finish', './finish', str, 'smooth'),
+        ('material', './material', str, 'Unknown'),
+        ('outerdiameter', './outerdiameter', XMLComponent.get_float, 0.0),
+        ('innerdiameter', './innerdiameter', XMLComponent.get_float, 0.0),
+        ('height', './height', XMLComponent.get_float, 0.0),
+        ('baseheight', './baseheight', XMLComponent.get_float, 0.0),
+        ('flangeheight', './flangeheight', XMLComponent.get_float, 0.0),
+        ('screwheight', './screwheight', XMLComponent.get_float, 0.0),
+        ('rail_id', './id', str, "-1")
     ]
 
     def getDictVals(self) -> dict:
@@ -294,7 +305,7 @@ class RailButton(Subcomponent):
 @register_component('motorconfiguration')
 class MotorConfig(Subcomponent):
     _FIELDS = [
-        ('configid', './/configid', str, "None"),
+        ('configid', './configid', str, "None"),
     ]
 
     def getDictVals(self) -> dict:        
@@ -308,17 +319,17 @@ class MotorConfig(Subcomponent):
 @register_component('masscomponent')
 class MassComponent(Subcomponent):
     _FIELDS = [
-        ('id', './/id', str, "-1"),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('packedlength', './/packedlength', XMLComponent.get_float, 0.0),
-        ('packedradius', './/packedradius', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('mass', './/mass', XMLComponent.get_float, 0.0),
-        ('masscomponenttype', './/masscomponenttype', str, 'masscomponent'),
+        ('id', './id', str, "-1"),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('packedlength', './packedlength', XMLComponent.get_float, 0.0),
+        ('packedradius', './packedradius', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('mass', './mass', XMLComponent.get_float, 0.0),
+        ('masscomponenttype', './masscomponenttype', str, 'masscomponent'),
     ]
 
     def getDictVals(self) -> dict:        
@@ -329,20 +340,20 @@ class MassComponent(Subcomponent):
 @register_component('innertube')
 class InnerTube(Subcomponent):
     _FIELDS = [
-        ('id', './/id', str, "-1"),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('material', './/material', str, 'Unknown'),
-        ('length', './/length', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
-        ('thickness', './/thickness', XMLComponent.get_float, 0.0),
-        ('clusterconfiguration', './/clusterconfiguration', str, 'single'),
-        ('clusterscale', './/clusterscale', XMLComponent.get_float, 1.0),
-        ('clusterrotation', './/clusterrotation', XMLComponent.get_float, 0.0),
+        ('id', './id', str, "-1"),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('material', './material', str, 'Unknown'),
+        ('length', './length', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('outerradius', './outerradius', XMLComponent.get_float, 0.0),
+        ('thickness', './thickness', XMLComponent.get_float, 0.0),
+        ('clusterconfiguration', './clusterconfiguration', str, 'single'),
+        ('clusterscale', './clusterscale', XMLComponent.get_float, 1.0),
+        ('clusterrotation', './clusterrotation', XMLComponent.get_float, 0.0),
     ]
 
     def getDictVals(self) -> dict:        
@@ -353,34 +364,34 @@ class InnerTube(Subcomponent):
 @register_component('trapezoidfinset')
 class TrapezoidFinSet(Subcomponent):
     _FIELDS = [
-        ('instancecount', './/instancecount', int, 1),
-        ('fincount', './/fincount', int, 0),
-        ('radiusoffset', './/radiusoffset', XMLComponent.get_float, 0.0),
-        ('angleoffset', './/angleoffset', XMLComponent.get_float, 0.0),
-        ('rotation', './/rotation', XMLComponent.get_float, 0.0),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('finish', './/finish', str, 'smooth'),
-        ('material', './/material', str, 'Unknown'),
-        ('thickness', './/thickness', XMLComponent.get_float, 0.0),
-        ('crosssection', './/crosssection', str, 'square'),
-        ('cant', './/cant', XMLComponent.get_float, 0.0),
-        ('tabheight', './/tabheight', XMLComponent.get_float, 0.0),
-        ('tablength', './/tablength', XMLComponent.get_float, 0.0),
-        ('tabposition', './/tabposition', XMLComponent.get_float, 0.0),
-        ('filletradius', './/filletradius', XMLComponent.get_float, 0.0),
-        ('filletmaterial', './/filletmaterial', str, 'Unknown'),
-        ('rootchord', './/rootchord', XMLComponent.get_float, 0.0),
-        ('tipchord', './/tipchord', XMLComponent.get_float, 0.0),
-        ('sweeplength', './/sweeplength', XMLComponent.get_float, 0.0),
-        ('height', './/height', XMLComponent.get_float, 0.0),
+        ('instancecount', './instancecount', int, 1),
+        ('fincount', './fincount', int, 0),
+        ('radiusoffset', './radiusoffset', XMLComponent.get_float, 0.0),
+        ('angleoffset', './angleoffset', XMLComponent.get_float, 0.0),
+        ('rotation', './rotation', XMLComponent.get_float, 0.0),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('finish', './finish', str, 'smooth'),
+        ('material', './material', str, 'Unknown'),
+        ('thickness', './thickness', XMLComponent.get_float, 0.0),
+        ('crosssection', './crosssection', str, 'square'),
+        ('cant', './cant', XMLComponent.get_float, 0.0),
+        ('tabheight', './tabheight', XMLComponent.get_float, 0.0),
+        ('tablength', './tablength', XMLComponent.get_float, 0.0),
+        ('tabposition', './tabposition', XMLComponent.get_float, 0.0),
+        ('filletradius', './filletradius', XMLComponent.get_float, 0.0),
+        ('filletmaterial', './filletmaterial', str, 'Unknown'),
+        ('rootchord', './rootchord', XMLComponent.get_float, 0.0),
+        ('tipchord', './tipchord', XMLComponent.get_float, 0.0),
+        ('sweeplength', './sweeplength', XMLComponent.get_float, 0.0),
+        ('height', './height', XMLComponent.get_float, 0.0),
     ]
 
     def getDictVals(self) -> dict:
         return {
-            "fin_sweep_length": self.sweepLength,
+            "fin_sweep_length": self.sweeplength,
             "fin_cant_angle": self.cant,
             "fin_span": self.height,
             "fin_position": self.position,
@@ -395,19 +406,19 @@ class TrapezoidFinSet(Subcomponent):
 @register_component('centeringring')
 class CenteringRing(Subcomponent):
     _FIELDS = [
-         ('id', './/id', str, "-1"),
-        ('instancecount', './/instancecount', int, 1),
-        ('instanceseparation', './/instanceseparation', XMLComponent.get_float, 0.0),
-        ('axialoffset', './/axialoffset', XMLComponent.get_float, 0.0),
-        ('position', './/position', XMLComponent.get_float, 0.0),
-        ('overridemass', './/overridemass', XMLComponent.get_float, 0.0),
-        ('overridesubcomponentsmass', './/overridesubcomponentsmass', XMLComponent.get_bool, False),
-        ('material', './/material', str, 'Unknown'),
-        ('length', './/length', XMLComponent.get_float, 0.0),
-        ('radialposition', './/radialposition', XMLComponent.get_float, 0.0),
-        ('radialdirection', './/radialdirection', XMLComponent.get_float, 0.0),
-        ('outerradius', './/outerradius', XMLComponent.get_float, 0.0),
-        ('innerradius', './/innerradius', XMLComponent.get_float, 0.0),
+         ('id', './id', str, "-1"),
+        ('instancecount', './instancecount', int, 1),
+        ('instanceseparation', './instanceseparation', XMLComponent.get_float, 0.0),
+        ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
+        ('position', './position', XMLComponent.get_float, 0.0),
+        ('overridemass', './overridemass', XMLComponent.get_float, 0.0),
+        ('overridesubcomponentsmass', './overridesubcomponentsmass', XMLComponent.get_bool, False),
+        ('material', './material', str, 'Unknown'),
+        ('length', './length', XMLComponent.get_float, 0.0),
+        ('radialposition', './radialposition', XMLComponent.get_float, 0.0),
+        ('radialdirection', './radialdirection', XMLComponent.get_float, 0.0),
+        ('outerradius', './outerradius', XMLComponent.get_float, 0.0),
+        ('innerradius', './innerradius', XMLComponent.get_float, 0.0),
     ]
 
     def getDictVals(self) -> dict:

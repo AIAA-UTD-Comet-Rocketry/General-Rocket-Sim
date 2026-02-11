@@ -283,7 +283,7 @@
                 <thickness>4.986999999999995E-4</thickness>
                 <clusterconfiguration>single</clusterconfiguration>
                 <clusterscale>1.0</clusterscale>
-                <clusterrotation>0.0</clusterrotation>
+         e       <clusterrotation>0.0</clusterrotation>
               </innertube>
 
               <trapezoidfinset>

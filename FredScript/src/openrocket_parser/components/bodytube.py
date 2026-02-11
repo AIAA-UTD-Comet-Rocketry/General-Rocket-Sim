@@ -16,9 +16,9 @@ class BodyTube(Subcomponent):
     BodyTube Subcomponent from OpenRocket, created when a bodytube xml element is found
     """
     _FIELDS = [
-        ('id', './/id', str, 'none'),
-        ('length', '../length', XMLComponent.get_float, 0),
-        ('mass', '../overridemass', XMLComponent.get_float, 0)
+        ('id', './id', str, 'none'),
+        ('length', './length', XMLComponent.get_float, 0),
+        ('mass', './overridemass', XMLComponent.get_float, 0)
     ]
 
 
