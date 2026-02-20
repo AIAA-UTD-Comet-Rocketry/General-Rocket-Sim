@@ -6,80 +6,85 @@ import pandas as pd
 
 # HERE ARE THE VARIABLES YOU WILL HAVE TO CHANGE
 
-#other stuff
+Parameters = {}
+
+#Non Rocket Parameters
 varyingPossibilities = ["airbrake", "finposition", "weatherHour"]
-varyingVariable = varyingPossibilities[2]
 
-numberSims = 40
-processes = 10
 
-latitude = 31.0437
-longitude = -103.532806
+Parameters["varyingVariable"] = varyingPossibilities[2]
 
-generatedFilesLocation ="IrecSims/"
+Parameters["numberSims"] = 40
+Parameters["processes"] = 10
+
+Parameters["latitude"] = 31.0437
+Parameters["longitude"] = -103.532806
+
+Parameters["generatedFilesLocation"] ="IrecSims/"
+
 
 #motor
-dryMotorMass = 5.578
-propellant_mass = 10.476-dryMotorMass
-grainInnerRadius = .02921/2
-grainOuterRadius = .0806/2
-grainHeight = 0.12488164
-the_nozzle_radius = .05224
-the_throat_radius= .0216
-the_nozzle_position = grainHeight * 4.25
-grain_center_of_mass_position = 0
-center_of_dry_mass_within_motor = 0
-motor_thrust_file = "updatedthrustcurve.csv"
-burn_time = 3.611
-numGrains = 6
-grainSeparation = .003175
-motorLength = (grainHeight + grainSeparation) * numGrains - grainSeparation
+Parameters["dryMotorMass"] = 5.578
+Parameters["propellant_mass"] = 10.476 - Parameters["dryMotorMass"]
+Parameters["grainInnerRadius"] = .02921/2
+Parameters["grainOuterRadius"] = .0806/2
+Parameters["grainHeight"] = 0.12488164
+Parameters["the_nozzle_radius"] = .05224
+Parameters["the_throat_radius"] = .0216
+Parameters["the_nozzle_position"] = Parameters["grainHeight"] * 4.25
+Parameters["grain_center_of_mass_position"] = 0
+Parameters["center_of_dry_mass_within_motor"] = 0
+Parameters["motor_thrust_file"] = "updatedthrustcurve.csv"
+Parameters["burn_time"] = 3.611
+Parameters["numGrains"] = 6
+Parameters["grainSeparation"] = .003175
+Parameters["motorLength"] = (Parameters["grainHeight"] + Parameters["grainSeparation"]) * Parameters["numGrains"] - Parameters["grainSeparation"]
 
 #rocket general
-spMass = 17.052
-spRadius = 0.154686/2
-spLength = 0.152+0.305+0.508+0.864+0.152
-the_center_of_mass_without_motor = 1.78
-power_off_file = "Sp25CDOFF4.24.csv"
-power_on_file = "Sp25CDON4.24.csv"
+Parameters["spMass"] = 17.052
+Parameters["spRadius"] = 0.154686/2
+Parameters["spLength"] = 0.152+0.305+0.508+0.864+0.152
+Parameters["the_center_of_mass_without_motor"] = 1.78
+Parameters["power_off_file"] = "Sp25CDOFF4.24.csv"
+Parameters["power_on_file"] = "Sp25CDON4.24.csv"
 
 #nose cone
-nose_cone_length = .813
-nose_cone_type = "von karman"
+Parameters["nose_cone_length"] = .813
+Parameters["nose_cone_type"] = "von karman"
 
 #fins
-the_fin_position = 2.57
-finSpan = 0.216
-root_chord=0.279
-tip_chord=0.091
-fin_cant_angle = 0
-fin_sweep_length = 0.173
-numFins = 4
+Parameters["the_fin_position"] = 2.57
+Parameters["finSpan"] = 0.216
+Parameters["root_chord"] =0.279
+Parameters["tip_chord"] = 0.091
+Parameters["fin_cant_angle"] = 0
+Parameters["fin_sweep_length"] = 0.173
+Parameters["numFins"] = 4
 
 #bottail
-boattailPos = 0.813+0.152+0.305+0.508+0.864+0.152
-boattail_bottom_radius = 0.129/2
-bottail_length = 0.203
+Parameters["boattailPos"] = 0.813+0.152+0.305+0.508+0.864+0.152
+Parameters["boattail_bottom_radius"] = 0.129/2
+Parameters["bottail_length"] = 0.203
 
 #parachutes
-drogueRadius = 0.61/2
-drogueCdS = 0.97*3.1415*(drogueRadius)**2
-lightRadius = 3.05/2
-lightCdS = 2.2*3.1415*(lightRadius)**2
-lag_rec = 0
-lag_se = 0
-drogueTrigger = "apogee"
-lightTrigger = 450
+Parameters["drogueRadius"] = 0.61/2
+Parameters["drogueCdS"] = 0.97*3.1415*(Parameters["drogueRadius"])**2
+Parameters["lightRadius"] = 3.05/2
+Parameters["lightCdS"] = 2.2*3.1415*(Parameters["lightRadius"])**2
+Parameters["lag_rec"] = 0
+Parameters["lag_se"] = 0
+Parameters["drogueTrigger"] = "apogee"
+Parameters["lightTrigger"] = 450
 
 #rail buttons
-lower_railbutton_position = 2.79
-upper_railbutton_position = 1.96
-railbutton_angular_position = 130
+Parameters["lower_railbutton_position"] = 2.79
+Parameters["upper_railbutton_position"] = 1.96
+Parameters["railbutton_angular_position"] = 130
 
 
 #environment
-fahrenheit_temp = 85
-envParams = {
+Parameters["fahrenheit_temp"] = 85
+Parameters["envParams"] = {
     "latitude": 31.043722,
     "longitude": -103.532806,
     "elevation": 915,
@@ -88,19 +93,19 @@ envParams = {
 }
 
 #final rocket stuff
-inclination = 89
-heading = 90
-rail_length = 4.1416
+Parameters["inclination"] = 89
+Parameters["heading"] = 90
+Parameters["rail_length"] = 4.1416
 
 #airbrakes
-air_brake_drag = "ReferencedFiles/air_brake_drag_full.csv"
+Parameters["air_brake_drag"] = "ReferencedFiles/air_brake_drag_full.csv"
 
-airbrake_sample_rate = 100 # 1 herz, so every .1 seconds
-airbrake_clamp = True
-override_rocketdrag_with_airbrakedrag = True
-airbrake_area = 2 # in meters
+Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
+Parameters["airbrake_clamp"] = True
+Parameters["override_rocketdrag_with_airbrakedrag"] = True
+Parameters["airbrake_area"] = 2 # in meters
 
-halfway_to_target = 1524
+Parameters["halfway_to_target"] = 1524
 
 lookupTable = "./ReferencedFiles/FinalLookupTable.csv"
 
@@ -127,30 +132,30 @@ angleVals = [65, 70, 75, 80, 85, 90]
 
 
 
-totalMotorMass = dryMotorMass + propellant_mass
-totalHeight = grainHeight * numGrains
+Parameters["totalMotorMass"] = Parameters["dryMotorMass"] + Parameters["propellant_mass"]
+Parameters["totalHeight"] = Parameters["grainHeight"] * Parameters["numGrains"]
 # area = pi * r^2 * height
-motor_volume = (((np.pi * grainOuterRadius ** 2) - (np.pi * grainInnerRadius ** 2)) * totalHeight)
-motor_11_inertia = (1/12)*dryMotorMass*(grainOuterRadius)**2
-motor_density = propellant_mass/motor_volume
-motor_33_inertia = ((1/4)*dryMotorMass*(grainOuterRadius)**2) + (1/12)*dryMotorMass*(motorLength)**2
-the_motor_position = spLength + nose_cone_length + grainHeight/2 - (totalHeight)/2
-the_motor_center_of_dry_mass_position = the_motor_position
+Parameters["motor_volume"] = (((np.pi * Parameters["grainOuterRadius"] ** 2) - (np.pi * Parameters["grainInnerRadius"] ** 2)) * Parameters["totalHeight"])
+Parameters["motor_11_inertia"] = (1/12)*Parameters["dryMotorMass"]*(Parameters["grainOuterRadius"])**2
+Parameters["motor_density"] = Parameters["propellant_mass"]/Parameters["motor_volume"]
+Parameters["motor_33_inertia"] = ((1/4)*Parameters["dryMotorMass"]*(Parameters["grainOuterRadius"])**2) + (1/12)*Parameters["dryMotorMass"]*(Parameters["motorLength"])**2
+Parameters["the_motor_position"] = Parameters["spLength"] + Parameters["nose_cone_length"] + Parameters["grainHeight"]/2 - (Parameters["totalHeight"])/2
+Parameters["the_motor_center_of_dry_mass_position"] = Parameters["the_motor_position"]
 
-_, _, points = motor.Motor.import_eng("ReferencedFiles/" + motor_thrust_file)
+_, _, points = motor.Motor.import_eng("ReferencedFiles/" + Parameters["motor_thrust_file"])
 thrust_source = points
 interpolation_method = "linear"
 thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
-impulse = thrust.integral(0, burn_time)*2.5
+Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])*2.5
 
-spCentralAxis = (spRadius**2)*spMass*1/2
-spCentralDiameter = ((1/4)*spMass*(spRadius)**2) + (1/12)*spMass*(spLength)**2
-rocket_center_of_dry_mass_position = (the_center_of_mass_without_motor * spMass + the_motor_center_of_dry_mass_position * dryMotorMass) / (dryMotorMass + spMass)
+Parameters["spCentralAxis"] = (Parameters["spRadius"]**2)*Parameters["spMass"]*1/2
+Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["spRadius"])**2) + (1/12)*Parameters["spMass"]*(Parameters["spLength"])**2
+Parameters["rocket_center_of_dry_mass_position"] = (Parameters["the_center_of_mass_without_motor"] * Parameters["spMass"] + Parameters["the_motor_center_of_dry_mass_position"] * Parameters["dryMotorMass"]) / (Parameters["dryMotorMass"] + Parameters["spMass"])
 
-power_off = 1
-power_on = 1
-kelvin_temp = (fahrenheit_temp - 32) * 5/9 + 273.15
-nose_position = 0
+Parameters["power_off"] = 1
+Parameters["power_on"] = 1
+Parameters["kelvin_temp"] = (Parameters["fahrenheit_temp"] - 32) * 5/9 + 273.15
+Parameters["nose_position"] = 0
 
 def getPitch(q):
     def quat_conjugate(q):
@@ -283,7 +288,7 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
 
 
     # Check if the rocket has reached burnout
-    if (vz > 0 and time > burn_time):
+    if (vz > 0 and time > Parameters["burn_time"]):
         air_brakes.deployment_level = deploymentLevel
         canDeployAirbrake = True
         print(f"WE CAN DEPLOY! Deployment level is {deploymentLevel}. Also, time is {time}, row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
@@ -295,3 +300,5 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
         air_brakes.deployment_level,
         air_brakes.drag_coefficient(air_brakes.deployment_level, mach_number),
     )
+
+Parameters["airbrake_controller_function"] = airbrake_controller_function
