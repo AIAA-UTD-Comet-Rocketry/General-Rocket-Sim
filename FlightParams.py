@@ -1,3 +1,4 @@
+import json
 import math
 from rocketpy.mathutils.function import Function
 from rocketpy.motors import motor
@@ -42,7 +43,7 @@ Parameters["motorLength"] = (Parameters["grainHeight"] + Parameters["grainSepara
 
 #rocket general
 Parameters["spMass"] = 17.052
-Parameters["spRadius"] = 0.154686/2
+Parameters["rocket_radius"] = 0.154686/2
 Parameters["spLength"] = 0.152+0.305+0.508+0.864+0.152
 Parameters["the_center_of_mass_without_motor"] = 1.78
 Parameters["power_off_file"] = "Sp25CDOFF4.24.csv"
@@ -53,13 +54,13 @@ Parameters["nose_cone_length"] = .813
 Parameters["nose_cone_type"] = "von karman"
 
 #fins
-Parameters["the_fin_position"] = 2.57
-Parameters["finSpan"] = 0.216
+Parameters["fin_position"] = 2.57
+Parameters["fin_span"] = 0.216
 Parameters["root_chord"] =0.279
 Parameters["tip_chord"] = 0.091
 Parameters["fin_cant_angle"] = 0
 Parameters["fin_sweep_length"] = 0.173
-Parameters["numFins"] = 4
+Parameters["num_fins"] = 4
 
 #bottail
 Parameters["boattailPos"] = 0.813+0.152+0.305+0.508+0.864+0.152
@@ -148,8 +149,8 @@ interpolation_method = "linear"
 thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
 Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])*2.5
 
-Parameters["spCentralAxis"] = (Parameters["spRadius"]**2)*Parameters["spMass"]*1/2
-Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["spRadius"])**2) + (1/12)*Parameters["spMass"]*(Parameters["spLength"])**2
+Parameters["spCentralAxis"] = (Parameters["rocket_radius"]**2)*Parameters["spMass"]*1/2
+Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["rocket_radius"])**2) + (1/12)*Parameters["spMass"]*(Parameters["spLength"])**2
 Parameters["rocket_center_of_dry_mass_position"] = (Parameters["the_center_of_mass_without_motor"] * Parameters["spMass"] + Parameters["the_motor_center_of_dry_mass_position"] * Parameters["dryMotorMass"]) / (Parameters["dryMotorMass"] + Parameters["spMass"])
 
 Parameters["power_off"] = 1
@@ -302,3 +303,18 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
     )
 
 Parameters["airbrake_controller_function"] = airbrake_controller_function
+
+with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
+    jsonData = json.load(f)
+
+print(jsonData)
+
+for key in Parameters:
+    # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
+    # or something like that
+    
+    if key in jsonData:
+        print(f"Found {key} in the json, setting it now!")
+        Parameters[key] = jsonData[key]
+    else:
+        print(f"The key {key} wasn't in the OpenRocket data!")

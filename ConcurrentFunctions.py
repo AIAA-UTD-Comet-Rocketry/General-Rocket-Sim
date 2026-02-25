@@ -51,7 +51,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
 
         Sp25 = Rocket(
             mass = setting["rocket_mass"], #OpenRocket
-            radius = FlightParams.Parameters["spRadius"], #OpenRocket
+            radius = FlightParams.Parameters["rocket_radius"], #OpenRocket
             inertia = (FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralAxis"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
             center_of_mass_without_motor = setting["rocket_CM"], # OpenRocket
@@ -65,9 +65,9 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
 
         nose_cone = Sp25.add_nose(
             length = FlightParams.Parameters["nose_cone_length"], kind = FlightParams.Parameters["nose_cone_type"], position = FlightParams.Parameters["nose_position"])
-        fin_set = Sp25.add_trapezoidal_fins(n=FlightParams.Parameters["numFins"], root_chord= FlightParams.Parameters["root_chord"], tip_chord=FlightParams.Parameters["tip_chord"], span=FlightParams.Parameters["finSpan"],
+        fin_set = Sp25.add_trapezoidal_fins(n=FlightParams.Parameters["num_fins"], root_chord= FlightParams.Parameters["root_chord"], tip_chord=FlightParams.Parameters["tip_chord"], span=FlightParams.Parameters["fin_span"],
             position = setting["fin_position"],cant_angle=FlightParams.Parameters["fin_cant_angle"], sweep_length=FlightParams.Parameters["fin_sweep_length"])
-        boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["spRadius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["bottail_length"],position = FlightParams.Parameters["boattailPos"])
+        boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["bottail_length"],position = FlightParams.Parameters["boattailPos"])
 
         if(setting["time_to_deploy_airbrake_after_burnout"] != -1):
             Sp25.add_air_brakes(
