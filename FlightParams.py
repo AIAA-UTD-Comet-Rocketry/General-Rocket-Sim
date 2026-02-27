@@ -127,8 +127,32 @@ angleVals = [65, 70, 75, 80, 85, 90]
 
 
 
+with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
+    jsonData = json.load(f)
+for key in Parameters:
+    # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
+    # or something like that
+    
+    if key in jsonData:
+        # print(f"Found {key} in the json, setting it now!")
+        Parameters[key] = jsonData[key]
+    else:
+        print(f"The key {key} wasn't in the OpenRocket data!")
+
+
+
+
+
+
+
+
+
+
+
+
 
 # HERE ARE THE VARIABLES YOU DON'T HAVE TO CHANGE
+
 
 
 
@@ -303,18 +327,3 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
     )
 
 Parameters["airbrake_controller_function"] = airbrake_controller_function
-
-with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
-    jsonData = json.load(f)
-
-print(jsonData)
-
-for key in Parameters:
-    # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
-    # or something like that
-    
-    if key in jsonData:
-        print(f"Found {key} in the json, setting it now!")
-        Parameters[key] = jsonData[key]
-    else:
-        print(f"The key {key} wasn't in the OpenRocket data!")

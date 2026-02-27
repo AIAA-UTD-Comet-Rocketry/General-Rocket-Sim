@@ -20,7 +20,7 @@ class NoseCone(Subcomponent):
     def getDictVals(self) -> dict:
         return {
             "nose_cone_type": self.shape,
-            "nose_length": self.length,
+            "nose_cone_length": self.length,
             "nose_mass": self.mass
         }
 

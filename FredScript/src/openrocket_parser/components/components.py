@@ -265,9 +265,9 @@ class Parachute(Subcomponent):
         elif(self.deployevent == "altitude"):
             triggerVal = self.deployaltitude
         return {
-            "parachute_cd": self.cd,
-            "parachute_trigger": triggerVal,
-            "parachute_lag": self.deploydelay,
+            f"parachute_{self.id}_cd": self.cd,
+            f"parachute_{self.id}_trigger": triggerVal,
+            f"parachute_{self.id}_lag": self.deploydelay,
             f"parachute_{self.id}_mass": self.overridemass
         }
     
@@ -290,12 +290,11 @@ class RailButton(Subcomponent):
         ('baseheight', './baseheight', XMLComponent.get_float, 0.0),
         ('flangeheight', './flangeheight', XMLComponent.get_float, 0.0),
         ('screwheight', './screwheight', XMLComponent.get_float, 0.0),
-        ('rail_id', './id', str, "-1")
+        ('rail_id', './id', str, "-1"),
     ]
 
     def getDictVals(self) -> dict:
         return {
-            "rail_id": self.rail_id,
             f"rail_{self.rail_id}_position": self.position,
             f"rail_{self.rail_id}_positionType": self.railbutton_positionType,
             f"rail_{self.rail_id}_angle": self.angleoffset,
@@ -399,7 +398,7 @@ class TrapezoidFinSet(Subcomponent):
             "root_chord": self.rootchord,
             "tip_chord": self.tipchord,
             "fin_height": self.height,
-            "position_version": self.trapezoidfinset_positionType,
+            "fin_position_version": self.trapezoidfinset_positionType,
             "fin_mass": self.overridemass
         }
 
