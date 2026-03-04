@@ -405,7 +405,7 @@ class TrapezoidFinSet(Subcomponent):
 @register_component('centeringring')
 class CenteringRing(Subcomponent):
     _FIELDS = [
-         ('id', './id', str, "-1"),
+        ('id', './id', str, "-1"),
         ('instancecount', './instancecount', int, 1),
         ('instanceseparation', './instanceseparation', XMLComponent.get_float, 0.0),
         ('axialoffset', './axialoffset', XMLComponent.get_float, 0.0),
@@ -424,3 +424,18 @@ class CenteringRing(Subcomponent):
         return {
             f"centeringRing_{self.id}_mass": self.overridemass
         }    
+
+@register_component('transition')
+class Bottail(Subcomponent):
+    _FIELDS = [
+        ('id', './id', str, "-1"),
+        ('length', './length', XMLComponent.get_float, 0.0),
+        ('foreradius', './foreradius', XMLComponent.get_float, 0.0),
+        ('aftradius', './aftradius', XMLComponent.get_float, 0.0)
+    ]
+
+    def getDictVals(self) -> dict:
+        return {
+            "boattail_length": self.length,
+            "boattail_bottom_radius": self.aftradius
+        }

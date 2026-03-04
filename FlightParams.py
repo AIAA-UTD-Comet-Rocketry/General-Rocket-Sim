@@ -21,7 +21,7 @@ Parameters["processes"] = 10
 Parameters["latitude"] = 31.0437
 Parameters["longitude"] = -103.532806
 
-Parameters["generatedFilesLocation"] ="IrecSims/"
+Parameters["generatedFilesLocation"] = "IrecSims/"
 
 
 #motor
@@ -65,17 +65,17 @@ Parameters["num_fins"] = 4
 #bottail
 Parameters["boattailPos"] = 0.813+0.152+0.305+0.508+0.864+0.152
 Parameters["boattail_bottom_radius"] = 0.129/2
-Parameters["bottail_length"] = 0.203
+Parameters["boattail_length"] = 0.203
 
 #parachutes
-Parameters["drogueRadius"] = 0.61/2
-Parameters["drogueCdS"] = 0.97*3.1415*(Parameters["drogueRadius"])**2
-Parameters["lightRadius"] = 3.05/2
-Parameters["lightCdS"] = 2.2*3.1415*(Parameters["lightRadius"])**2
-Parameters["lag_rec"] = 0
-Parameters["lag_se"] = 0
-Parameters["drogueTrigger"] = "apogee"
-Parameters["lightTrigger"] = 450
+# Parameters["drogueRadius"] = 0.61/2
+# Parameters["drogueCdS"] = 0.97*3.1415*(Parameters["drogueRadius"])**2
+# Parameters["lightRadius"] = 3.05/2
+# Parameters["lightCdS"] = 2.2*3.1415*(Parameters["lightRadius"])**2
+# Parameters["lag_rec"] = 0
+# Parameters["lag_se"] = 0
+# Parameters["drogueTrigger"] = "apogee"
+# Parameters["lightTrigger"] = 450
 
 #rail buttons
 Parameters["lower_railbutton_position"] = 2.79
@@ -123,8 +123,12 @@ maxVel = 275
 # angleVals = [90, 85, 80, 75, 70, 65]
 angleVals = [65, 70, 75, 80, 85, 90]
 
+Parameters["parachutes"] = {}
 
 
+
+
+print("YOU MUST STILL FILL IN THE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
 
 with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
@@ -137,8 +141,9 @@ for key in Parameters:
         # print(f"Found {key} in the json, setting it now!")
         Parameters[key] = jsonData[key]
     else:
-        print(f"The key {key} wasn't in the OpenRocket data!")
+        print(f"{key},")
 
+print("\n\nVARIABLES END\n\n")
 
 
 

@@ -67,7 +67,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
             length = FlightParams.Parameters["nose_cone_length"], kind = FlightParams.Parameters["nose_cone_type"], position = FlightParams.Parameters["nose_position"])
         fin_set = Sp25.add_trapezoidal_fins(n=FlightParams.Parameters["num_fins"], root_chord= FlightParams.Parameters["root_chord"], tip_chord=FlightParams.Parameters["tip_chord"], span=FlightParams.Parameters["fin_span"],
             position = setting["fin_position"],cant_angle=FlightParams.Parameters["fin_cant_angle"], sweep_length=FlightParams.Parameters["fin_sweep_length"])
-        boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["bottail_length"],position = FlightParams.Parameters["boattailPos"])
+        boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["boattail_length"],position = FlightParams.Parameters["boattailPos"])
 
         if(setting["time_to_deploy_airbrake_after_burnout"] != -1):
             Sp25.add_air_brakes(
@@ -91,16 +91,13 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
             angular_position=FlightParams.Parameters["railbutton_angular_position"]
         )
 
-        Drogue = Sp25.add_parachute(
-            "Drogue",
-            cd_s = setting["cd_s_drogue"],
-            trigger = FlightParams.Parameters["drogueTrigger"]
-        )
-        Light = Sp25.add_parachute(
-            "Light",
-            cd_s = setting["cd_s_light"],
-            trigger = FlightParams.Parameters["lightTrigger"]
-        )
+        for parachute in FlightParams.Parameters["parachutes"].values():
+            Sp25.add_parachute(
+                parachute["name"],
+                cd_s = parachute["cd"],
+                lag = parachute["lag"],
+                trigger = parachute["trigger"]
+            )
 
         try:
             # MotorOne.draw()
@@ -136,9 +133,9 @@ def flight_settings(analysis_parameters, total_number):
             else:
                 flight_setting[parameter_key] = choice(parameter_value)
 
-        # Skip if certain values are negative, which happens due to the normal curve but isnt realistic
-        if flight_setting["lag_rec"] < 0 or flight_setting["lag_se"] < 0:
-            continue
+        # # Skip if certain values are negative, which happens due to the normal curve but isnt realistic
+        # if flight_setting["lag_rec"] < 0 or flight_setting["lag_se"] < 0:
+        #     continue
 
         # Update counter
         i += 1

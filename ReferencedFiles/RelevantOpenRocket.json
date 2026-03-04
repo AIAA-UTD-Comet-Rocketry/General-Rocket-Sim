@@ -34,7 +34,7 @@
     "fin_sweep_length": 0.0254,
     "fin_cant_angle": 0.0,
     "fin_span": 0.0635,
-    "fin_position": 1.0540999999999998,
+    "fin_position": 1.1291,
     "num_fins": 4,
     "root_chord": 0.12699999999999997,
     "tip_chord": 0.127,
@@ -43,9 +43,20 @@
     "fin_mass": 0.025,
     "centeringRing_00b1d229-a0d1-4898-9623-3a9fb9acd838_mass": 0.02,
     "centeringRing_dbd560f3-f539-42b3-916f-8b5e909e1433_mass": 0.02,
-    "spLength": 1.0921999999999998,
+    "boattail_length": 0.07500000000000001,
+    "boattail_bottom_radius": 0.025,
+    "spLength": 1.1672,
     "spMass": 0.921841755258822,
-    "lower_railbutton_position": 0.7238999999999999,
-    "upper_railbutton_position": 0.9524999999999998,
-    "railbutton_angular_position": 180.0
+    "bottailPos": 1.0922,
+    "lower_railbutton_position": 0.7614,
+    "upper_railbutton_position": 0.9899999999999999,
+    "railbutton_angular_position": 180.0,
+    "parachutes": {
+        "6b8f7f9d-89b3-4208-8248-5284b6a40635": {
+            "lag": 0.0,
+            "cd": 0.0,
+            "trigger": "apogee",
+            "name": "6b8f7f9d-89b3-4208-8248-5284b6a40635"
+        }
+    }
 }
