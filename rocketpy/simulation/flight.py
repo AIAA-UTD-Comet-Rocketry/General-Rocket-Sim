@@ -668,6 +668,8 @@ class Flight:
     def __simulate(self, verbose):
         """Simulate the flight trajectory."""
         for phase_index, phase in self.time_iterator(self.flight_phases):
+            print("running")
+            
             # Determine maximum time for this flight phase
             phase.time_bound = self.flight_phases[phase_index + 1].t
 

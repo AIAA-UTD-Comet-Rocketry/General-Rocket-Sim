@@ -15,46 +15,61 @@ varyingPossibilities = ["airbrake", "finposition", "weatherHour"]
 
 Parameters["varyingVariable"] = varyingPossibilities[2]
 
-Parameters["numberSims"] = 40
-Parameters["processes"] = 10
+Parameters["hasBottail"] = False
 
-Parameters["latitude"] = 31.0437
-Parameters["longitude"] = -103.532806
+Parameters["numberSims"] = 60
+Parameters["processes"] = 4
+
+Parameters["fahrenheit_temp"] = 56
+Parameters["envParams"] = {
+    "latitude": 31.043722,
+    "longitude": -103.532806,
+    "elevation": 915,
+    "type": "custom_atmosphere",
+    "wind_u": 1.5,
+    "wind_v": 1.5,
+    "file": "ECMWF"
+}
+
+
+
 
 Parameters["generatedFilesLocation"] = "IrecSims/"
 
 
 #motor
-Parameters["dryMotorMass"] = 5.578
-Parameters["propellant_mass"] = 10.476 - Parameters["dryMotorMass"]
-Parameters["grainInnerRadius"] = .02921/2
-Parameters["grainOuterRadius"] = .0806/2
-Parameters["grainHeight"] = 0.12488164
-Parameters["the_nozzle_radius"] = .05224
-Parameters["the_throat_radius"] = .0216
+Parameters["dryMotorMass"] = 4.85
+Parameters["propellant_mass"] = 9.26 -4.85
+Parameters["grainInnerRadius"] = .02
+Parameters["grainOuterRadius"] = .04
+Parameters["grainHeight"] = 0.127
+Parameters["the_nozzle_radius"] = 0.098 / 2
+Parameters["the_throat_radius"] = .02286
 Parameters["the_nozzle_position"] = Parameters["grainHeight"] * 4.25
 Parameters["grain_center_of_mass_position"] = 0
 Parameters["center_of_dry_mass_within_motor"] = 0
-Parameters["motor_thrust_file"] = "updatedthrustcurve.csv"
-Parameters["burn_time"] = 3.611
+Parameters["motor_thrust_file"] = "Test Burn Csv real.csv"
+Parameters["burn_time"] = 3.396
 Parameters["numGrains"] = 6
 Parameters["grainSeparation"] = .003175
 Parameters["motorLength"] = (Parameters["grainHeight"] + Parameters["grainSeparation"]) * Parameters["numGrains"] - Parameters["grainSeparation"]
+Parameters["the_motor_position"] = 2.59
 
 #rocket general
-Parameters["spMass"] = 17.052
+Parameters["spMass"] = 13.9
 Parameters["rocket_radius"] = 0.154686/2
-Parameters["spLength"] = 0.152+0.305+0.508+0.864+0.152
-Parameters["the_center_of_mass_without_motor"] = 1.78
-Parameters["power_off_file"] = "Sp25CDOFF4.24.csv"
-Parameters["power_on_file"] = "Sp25CDON4.24.csv"
+Parameters["spLength"] = 0.889+1.19+0.152
+Parameters["the_center_of_mass_without_motor"] = 1.6
+Parameters["rocket_center_of_dry_mass_position"] = Parameters["the_center_of_mass_without_motor"]
+Parameters["power_off_file"] = "2026LSCCDOFF.csv"
+Parameters["power_on_file"] = "2026LSCCDON.csv"
 
 #nose cone
-Parameters["nose_cone_length"] = .813
+Parameters["nose_cone_length"] = 0.813
 Parameters["nose_cone_type"] = "von karman"
 
 #fins
-Parameters["fin_position"] = 2.57
+Parameters["fin_position"] = 2.78
 Parameters["fin_span"] = 0.216
 Parameters["root_chord"] =0.279
 Parameters["tip_chord"] = 0.091
@@ -63,9 +78,10 @@ Parameters["fin_sweep_length"] = 0.173
 Parameters["num_fins"] = 4
 
 #bottail
-Parameters["boattailPos"] = 0.813+0.152+0.305+0.508+0.864+0.152
-Parameters["boattail_bottom_radius"] = 0.129/2
-Parameters["boattail_length"] = 0.203
+if(Parameters["hasBottail"]):
+    Parameters["boattailPos"] = 0.813+0.152+0.305+0.508+0.864+0.152
+    Parameters["boattail_bottom_radius"] = 0.129/2
+    Parameters["boattail_length"] = 0.203
 
 #parachutes
 # Parameters["drogueRadius"] = 0.61/2
@@ -74,7 +90,7 @@ Parameters["boattail_length"] = 0.203
 # Parameters["lightCdS"] = 2.2*3.1415*(Parameters["lightRadius"])**2
 # Parameters["lag_rec"] = 0
 # Parameters["lag_se"] = 0
-# Parameters["drogueTrigger"] = "apogee"
+# Parameters["drogueTrigger"] = "apogee" 
 # Parameters["lightTrigger"] = 450
 
 #rail buttons
@@ -84,29 +100,22 @@ Parameters["railbutton_angular_position"] = 130
 
 
 #environment
-Parameters["fahrenheit_temp"] = 85
-Parameters["envParams"] = {
-    "latitude": 31.043722,
-    "longitude": -103.532806,
-    "elevation": 915,
-    "type": "standard_atmosphere",
-    "file": "ECMWF"
-}
 
 #final rocket stuff
-Parameters["inclination"] = 89
-Parameters["heading"] = 90
-Parameters["rail_length"] = 4.1416
+Parameters["inclination"] = 88
+Parameters["heading"] = 315
+Parameters["rail_length"] = 7.096
 
 #airbrakes
-Parameters["air_brake_drag"] = "ReferencedFiles/air_brake_drag_full.csv"
+Parameters["using-airbrakes"] = False
+if(Parameters["using-airbrakes"]):
+    Parameters["air_brake_drag"] = "ReferencedFiles/air_brake_drag_full.csv"
+    Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
+    Parameters["airbrake_clamp"] = True
+    Parameters["override_rocketdrag_with_airbrakedrag"] = True
+    Parameters["airbrake_area"] = 2 # in meters
 
-Parameters["airbrake_sample_rate"] = 1000 # 1 herz, so every .1 seconds
-Parameters["airbrake_clamp"] = True
-Parameters["override_rocketdrag_with_airbrakedrag"] = True
-Parameters["airbrake_area"] = 2 # in meters
-
-Parameters["halfway_to_target"] = 1524
+# Parameters["halfway_to_target"] = 1524
 
 lookupTable = "./ReferencedFiles/FinalLookupTable.csv"
 
@@ -133,6 +142,7 @@ print("YOU MUST STILL FILL IN THE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
 with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
     jsonData = json.load(f)
+print("Fin position is currently set to: " + str(jsonData["fin_position"]))
 for key in Parameters:
     # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
     # or something like that
@@ -169,18 +179,16 @@ Parameters["motor_volume"] = (((np.pi * Parameters["grainOuterRadius"] ** 2) - (
 Parameters["motor_11_inertia"] = (1/12)*Parameters["dryMotorMass"]*(Parameters["grainOuterRadius"])**2
 Parameters["motor_density"] = Parameters["propellant_mass"]/Parameters["motor_volume"]
 Parameters["motor_33_inertia"] = ((1/4)*Parameters["dryMotorMass"]*(Parameters["grainOuterRadius"])**2) + (1/12)*Parameters["dryMotorMass"]*(Parameters["motorLength"])**2
-Parameters["the_motor_position"] = Parameters["spLength"] + Parameters["nose_cone_length"] + Parameters["grainHeight"]/2 - (Parameters["totalHeight"])/2
 Parameters["the_motor_center_of_dry_mass_position"] = Parameters["the_motor_position"]
 
 _, _, points = motor.Motor.import_eng("ReferencedFiles/" + Parameters["motor_thrust_file"])
 thrust_source = points
 interpolation_method = "linear"
 thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
-Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"]) * 1.6
+Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
 
 Parameters["spCentralAxis"] = (Parameters["rocket_radius"]**2)*Parameters["spMass"]*1/2
 Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["rocket_radius"])**2) + (1/12)*Parameters["spMass"]*(Parameters["spLength"])**2
-Parameters["rocket_center_of_dry_mass_position"] = (Parameters["the_center_of_mass_without_motor"] * Parameters["spMass"] + Parameters["the_motor_center_of_dry_mass_position"] * Parameters["dryMotorMass"]) / (Parameters["dryMotorMass"] + Parameters["spMass"])
 
 Parameters["power_off"] = 1
 Parameters["power_on"] = 1

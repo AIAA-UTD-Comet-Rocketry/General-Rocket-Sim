@@ -1,5 +1,31 @@
-TOTAL SIMS IS: 40
+TOTAL SIMS IS: 60
 
 
-Completed 40 iterations successfully. Total CPU time: 19.640625 s. Total wall time: 19.933651208877563 s
-Number of simulations: 0
+Completed 60 iterations successfully. Total CPU time: 0.046875 s. Total wall time: 27.685969591140747 s
+Number of simulations: 60
+Out Of Rail Stability Margin -         Mean Value: 2.043 
+Out Of Rail Stability Margin - Standard Deviation: 0.000 m
+PROBABILITY THE Out Of Rail Stability Margin IS IN BETWEEN 1.5 AND 4 IS: 100.0%
+There is a 90% chance that the mean of the Out Of Rail Stability Margin falls within THIS RANGE: 2.0434600679588524, 2.043509343527732
+
+
+Apogee Altitude -         Mean Value: 3398.061 
+Apogee Altitude - Standard Deviation: 3.786 m
+PROBABILITY THE Apogee Altitude IS IN BETWEEN 3017.52 AND 3078.48 IS: 0.0%
+There is a 90% chance that the mean of the Apogee Altitude falls within THIS RANGE: 3397.256941869908, 3398.8649208891816
+
+We have the hypothesis that our mean is greater than or equal to 3048. With our critical percent, our critical value is -1.6448536269514729. Then, our test statistic is 716.1772457625791
+Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is 3048.
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+

@@ -1,4 +1,5 @@
 from rocketpy import Environment, SolidMotor, Rocket, Flight
+
 from numpy.random import normal, choice
 from time import process_time
 import numpy as np
@@ -17,14 +18,15 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
         filemode='a',  # 'w' for overwrite, 'a' for append
     )
     flightData = ["", "", ""]
-    env = Environment(latitude=envParams["latitude"], longitude=envParams["longitude"], elevation=envParams["elevation"], date=launchDate)
+    env = Environment(latitude=FlightParams.Parameters["envParams"]["latitude"], longitude=FlightParams.Parameters["envParams"]["longitude"], elevation=FlightParams.Parameters["envParams"]["elevation"], date=launchDate)
+    # env.set_atmospheric_model(type=envParams["type"], file=envParams["file"], wind_u=FlightParams.Parameters["envParams"]["wind_u"], wind_v=FlightParams.Parameters["envParams"]["wind_v"])
     i=0
     
     settings = flight_settings(analysis_parameters, numOfSims)
 
     for setting in settings:
         start_time = process_time()
-        env.set_atmospheric_model(type=envParams["type"], pressure= setting["atmosphere_pressure"], temperature= setting["temperature"], file=envParams["file"]) # Wind: (wind direction: 0 = North to South wind/90 = East to West wind, wind speed: m/s)
+        env.set_atmospheric_model(type=envParams["type"], file=envParams["file"], wind_u=setting["wind-u"], wind_v=setting["wind-v"])
         # env.set_atmospheric_model(type=envParams["type"], pressure= setting["atmosphere_pressure"], temperature= setting["temperature"], wind_u= windArray_u(0,5), wind_v= windArray_v(0,5)) # Wind: (wind direction: 0 = North to South wind/90 = East to West wind, wind speed: m/s)
         MotorOne = SolidMotor(
             thrust_source="ReferencedFiles/" + FlightParams.Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
@@ -54,10 +56,12 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
             radius = FlightParams.Parameters["rocket_radius"], #OpenRocket
             inertia = (FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralAxis"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
-            center_of_mass_without_motor = setting["rocket_CM"], # OpenRocket
+            center_of_mass_without_motor = FlightParams.Parameters["the_center_of_mass_without_motor"], # OpenRocket
             power_off_drag ="ReferencedFiles/" + str(FlightParams.Parameters["power_off_file"]), #Uploaded to drive
             power_on_drag = "ReferencedFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
         )
+
+        print("Center of mass without motor is currently set to: " + str(FlightParams.Parameters["the_center_of_mass_without_motor"]))
 
         # CHANGE ONCE YOU FIND A GOOD WAY TO DO SO
         # Sp25.power_off_drag *= setting["power_off_drag"]
@@ -66,11 +70,12 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
         nose_cone = Sp25.add_nose(
             length = FlightParams.Parameters["nose_cone_length"], kind = FlightParams.Parameters["nose_cone_type"], position = FlightParams.Parameters["nose_position"])
         fin_set = Sp25.add_trapezoidal_fins(n=FlightParams.Parameters["num_fins"], root_chord= FlightParams.Parameters["root_chord"], tip_chord=FlightParams.Parameters["tip_chord"], span=FlightParams.Parameters["fin_span"],
-            position = setting["fin_position"],cant_angle=FlightParams.Parameters["fin_cant_angle"], sweep_length=FlightParams.Parameters["fin_sweep_length"])
-        boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["boattail_length"],position = FlightParams.Parameters["boattailPos"])
+            position = FlightParams.Parameters["fin_position"],cant_angle=FlightParams.Parameters["fin_cant_angle"], sweep_length=FlightParams.Parameters["fin_sweep_length"])
+        
+        if(FlightParams.Parameters["hasBottail"]):
+            boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["boattail_length"],position = FlightParams.Parameters["boattailPos"])
 
-        if(setting["time_to_deploy_airbrake_after_burnout"] != -1):
-            print("Adding airbrakes!")
+        if(FlightParams.Parameters["using-airbrakes"]):
             Sp25.add_air_brakes(
                 drag_coefficient_curve= FlightParams.Parameters["air_brake_drag"],
                 # drag_coefficient_curve= 1,
@@ -105,13 +110,16 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
             # MotorOne.all_info()
 
             # Sp25.draw()
-            # Sp25.all_info()
-            
+            Sp25.all_info()
+
+            print("Center of mass without motor is currently set to: " + str(FlightParams.Parameters["the_center_of_mass_without_motor"]))
+
             testFlight = Flight(
                 rocket=Sp25, environment=env,rail_length = FlightParams.Parameters["rail_length"],inclination = setting["inclination"],
                 heading=setting["heading"], terminate_on_apogee = termOnApogee
             )
             testFlight.info()
+            print("flgith complete1")
             inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env)
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])

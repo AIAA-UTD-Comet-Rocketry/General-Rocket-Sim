@@ -1,0 +1,69 @@
+Auto-Transcript Start Time:  20:28:31, 05 Mar 2026 Central Standard Time 
+Current Directory: "C:\Users\AIAA UT Dallas\Documents\Comet Rocketry Sims\CometRocketryRocketpySims"
+Information: The server has started and is running.
+
+              Welcome to ANSYS Fluent 2025 R2
+
+              Copyright 1987-2025 ANSYS, Inc. All Rights Reserved.
+              Unauthorized use, distribution or duplication is prohibited.
+              This product is subject to U.S. laws governing export and re-export.
+              For full Legal Notice, see documentation.
+
+Build Time: Jun 16 2025 10:42:46 EDT  Build Id: 10204  
+ 
+Connected License Server List:	1055@AIAA-UTD-Computer
+
+     --------------------------------------------------------------
+     This is an academic version of ANSYS FLUENT. Usage of this product
+     license is limited to the terms and conditions specified in your ANSYS
+     license form, additional terms section.
+     --------------------------------------------------------------
+Host spawning Node 0 on machine "AIAA-UTD-Computer" (win64).
+
+-------------------------------------------------------------------------------
+ID    Hostname           Core   O.S.         PID    Vendor          
+-------------------------------------------------------------------------------
+n19   AIAA-UTD-Computer  20/64  Windows-x64  57024  AMD Ryzen       
+n18   AIAA-UTD-Computer  19/64  Windows-x64  56872  AMD Ryzen       
+n17   AIAA-UTD-Computer  18/64  Windows-x64  52416  AMD Ryzen       
+n16   AIAA-UTD-Computer  17/64  Windows-x64  54212  AMD Ryzen       
+n15   AIAA-UTD-Computer  16/64  Windows-x64  44060  AMD Ryzen       
+n14   AIAA-UTD-Computer  15/64  Windows-x64  46288  AMD Ryzen       
+n13   AIAA-UTD-Computer  14/64  Windows-x64  34488  AMD Ryzen       
+n12   AIAA-UTD-Computer  13/64  Windows-x64  53520  AMD Ryzen       
+n11   AIAA-UTD-Computer  12/64  Windows-x64  48572  AMD Ryzen       
+n10   AIAA-UTD-Computer  11/64  Windows-x64  57844  AMD Ryzen       
+n9    AIAA-UTD-Computer  10/64  Windows-x64  36540  AMD Ryzen       
+n8    AIAA-UTD-Computer  9/64   Windows-x64  60456  AMD Ryzen       
+n7    AIAA-UTD-Computer  8/64   Windows-x64  19592  AMD Ryzen       
+n6    AIAA-UTD-Computer  7/64   Windows-x64  57604  AMD Ryzen       
+n5    AIAA-UTD-Computer  6/64   Windows-x64  51928  AMD Ryzen       
+n4    AIAA-UTD-Computer  5/64   Windows-x64  44472  AMD Ryzen       
+n3    AIAA-UTD-Computer  4/64   Windows-x64  61500  AMD Ryzen       
+n2    AIAA-UTD-Computer  3/64   Windows-x64  48088  AMD Ryzen       
+n1    AIAA-UTD-Computer  2/64   Windows-x64  53184  AMD Ryzen       
+n0*   AIAA-UTD-Computer  1/64   Windows-x64  55484  AMD Ryzen       
+host  AIAA-UTD-Computer         Windows-x64  28872  AMD Ryzen       
+
+MPI Option Selected: intel
+Selected system interconnect: default
+-------------------------------------------------------------------------------
+
+Cleanup script file is C:\\Users\\AIAA UT Dallas\\Documents\\Comet Rocketry Sims\\CometRocketryRocketpySims\\cleanup-fluent-AIAA-UTD-Computer-28872.bat
+
+Graphics driver currently in use: dx11
+
+(cx-gui-do cx-activate-tab-index "NavigationPane*Frame1(TreeTab)" 0)
+
+Posting ANSYS Product Improvement Program startup data
+Done.
+>>> 
+Posting ANSYS Product Improvement Program performance data 
+Done.
+Shutting down Server...
+Services Shutdown...Done.
+Server Shutdown...Done.
+Queue Cleared...Done.
+Shutdown Complete.
+Auto-Transcript Stop Time:  20:29:04, 05 Mar 2026 Central Standard Time 
+Total Transcript Time: 0 Minute 32 Second.
