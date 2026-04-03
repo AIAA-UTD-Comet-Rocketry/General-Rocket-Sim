@@ -94,7 +94,7 @@ class XMLComponent(ABC):
             if id is not None:
                 setattr(self, "id", id)
         elif(elemName == "bodytube"):
-            if(path != "./configid" and path != "./innerradius" and path != "./length" and path != "./outerradius"):
+            if(path != "./configid" and path != "./innerradius" and path != "./length" and path != "./outerradius" and path != "./overridemass"):
                 print(f"Bodytube path is {path}, attribute name is {attr_name}")
                 actualElement = self.element.find(path)
                 id = actualElement.attrib.get("id")

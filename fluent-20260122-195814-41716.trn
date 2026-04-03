@@ -1,0 +1,51 @@
+Auto-Transcript Start Time:  19:58:14, 22 Jan 2026 Central Standard Time 
+Current Directory: "C:\Users\AIAA UT Dallas\Documents\Comet Rocketry Sims\CometRocketryRocketpySims"
+Information: The server has started and is running.
+
+              Welcome to ANSYS Fluent 2025 R2
+
+              Copyright 1987-2025 ANSYS, Inc. All Rights Reserved.
+              Unauthorized use, distribution or duplication is prohibited.
+              This product is subject to U.S. laws governing export and re-export.
+              For full Legal Notice, see documentation.
+
+Build Time: Jun 16 2025 10:42:46 EDT  Build Id: 10204  
+ 
+Connected License Server List:	1055@AIAA-UTD-Computer
+
+*********************************************
+Info: Your license enables 4-way parallel execution.
+For faster simulations, please start the application with the appropriate parallel options.
+*********************************************
+
+
+     --------------------------------------------------------------
+     This is an academic version of ANSYS FLUENT. Usage of this product
+     license is limited to the terms and conditions specified in your ANSYS
+     license form, additional terms section.
+     --------------------------------------------------------------
+Host spawning Node 0 on machine "AIAA-UTD-Computer" (win64).
+
+-------------------------------------------------------------------------------
+ID    Hostname           Core  O.S.         PID    Vendor          
+-------------------------------------------------------------------------------
+n1    AIAA-UTD-Computer  2/64  Windows-x64  33408  AMD Ryzen       
+n0*   AIAA-UTD-Computer  1/64  Windows-x64  40388  AMD Ryzen       
+host  AIAA-UTD-Computer        Windows-x64  30156  AMD Ryzen       
+
+MPI Option Selected: intel
+Selected system interconnect: default
+-------------------------------------------------------------------------------
+
+Cleanup script file is C:\\Users\\AIAA UT Dallas\\Documents\\Comet Rocketry Sims\\CometRocketryRocketpySims\\cleanup-fluent-AIAA-UTD-Computer-30156.bat
+
+Graphics driver currently in use: dx11
+
+
+Posting ANSYS Product Improvement Program startup data
+Done.
+>>> Shutting down Server...
+Services Shutdown...Done.
+Server Shutdown...Done.
+Queue Cleared...Done.
+Shutdown Complete.

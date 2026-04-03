@@ -16,11 +16,12 @@ def load_rocket_from_xml(file_path: str) -> (Rocket, dict):
     """
 
     rocket = load_rocket_from_xml_safe(file_path)
-    rocketpyElems = rocket.rocketpyElems
     if rocket is None:
         error = f'Could not load rocket from {file_path}'
         logging.error(error)
         raise ValueError(error)
+    
+    rocketpyElems = rocket.rocketpyElems
 
     if len(rocketpyElems) == 0:
         error = "Dictionary is Empty when it really shouldn't be."
