@@ -70,6 +70,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
         boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["boattail_length"],position = FlightParams.Parameters["boattailPos"])
 
         if(setting["time_to_deploy_airbrake_after_burnout"] != -1):
+            print("Adding airbrakes!")
             Sp25.add_air_brakes(
                 drag_coefficient_curve= FlightParams.Parameters["air_brake_drag"],
                 # drag_coefficient_curve= 1,

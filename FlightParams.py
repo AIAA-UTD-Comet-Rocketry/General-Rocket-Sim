@@ -101,7 +101,7 @@ Parameters["rail_length"] = 4.1416
 #airbrakes
 Parameters["air_brake_drag"] = "ReferencedFiles/air_brake_drag_full.csv"
 
-Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
+Parameters["airbrake_sample_rate"] = 1000 # 1 herz, so every .1 seconds
 Parameters["airbrake_clamp"] = True
 Parameters["override_rocketdrag_with_airbrakedrag"] = True
 Parameters["airbrake_area"] = 2 # in meters
@@ -176,7 +176,7 @@ _, _, points = motor.Motor.import_eng("ReferencedFiles/" + Parameters["motor_thr
 thrust_source = points
 interpolation_method = "linear"
 thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
-Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])*2.5
+Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"]) * 1.6
 
 Parameters["spCentralAxis"] = (Parameters["rocket_radius"]**2)*Parameters["spMass"]*1/2
 Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["rocket_radius"])**2) + (1/12)*Parameters["spMass"]*(Parameters["spLength"])**2
@@ -304,7 +304,8 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
     angleIndex = len(angleVals) - angleIndex - 1
 
     print(f"The goddamn altitude: {above_ground_altitude}")
-    print(f"The index is: {altitudeIndex}, while the number of altitudes is {len(altitudeVals)}")
+    print(f"The altitude index is: {altitudeIndex}, while the number of altitudes is {len(altitudeVals)}")
+    print(f"The velocity index is: {velocityIndex}, while the number of altitudes is {len(velocityVals)}")
     # print(altitudeVals)
 
     # print(f"row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}")
@@ -321,7 +322,7 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
     if (vz > 0 and time > Parameters["burn_time"]):
         air_brakes.deployment_level = deploymentLevel
         canDeployAirbrake = True
-        print(f"WE CAN DEPLOY! Deployment level is {deploymentLevel}. Also, time is {time}, row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
+        print(f"WE CAN DEPLOY! Deployment level is {air_brakes.deployment_level}. Also, time is {time}, row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
               angle value is {angleIndex} and velocity index is {velocityIndex}")
             
     return (
