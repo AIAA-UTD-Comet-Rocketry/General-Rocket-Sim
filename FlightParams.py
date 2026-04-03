@@ -90,7 +90,7 @@ if(Parameters["hasBottail"]):
 # Parameters["lightCdS"] = 2.2*3.1415*(Parameters["lightRadius"])**2
 # Parameters["lag_rec"] = 0
 # Parameters["lag_se"] = 0
-# Parameters["drogueTrigger"] = "apogee"
+# Parameters["drogueTrigger"] = "apogee" 
 # Parameters["lightTrigger"] = 450
 
 #rail buttons
