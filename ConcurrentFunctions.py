@@ -3,6 +3,7 @@ from rocketpy import Environment, SolidMotor, Rocket, Flight
 from numpy.random import normal, choice
 from time import process_time
 import numpy as np
+import pandas as pd
 from wind import windArray_u, windArray_v
 
 import FlightParams
@@ -10,7 +11,7 @@ import FlightParams
 import logging
 
 # Configure logging
-def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_cpu_time, termOnApogee, launchDate):
+def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_cpu_time, termOnApogee, launchDate, obtainingMotorValue):
     logging.basicConfig(
         filename='app.log',  # Change this to your desired log file
         level=logging.INFO,
@@ -105,12 +106,20 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
                 trigger = parachute["trigger"]
             )
 
+        neededTimes = pd.read_csv("ReferencedFiles/requiredSampleTimes.csv", header = 0)
+        sampledMasses = [Sp25.total_mass(t) for t in neededTimes["Flight_Time_(s)"].to_numpy()]
+        neededTimes["mass"] = sampledMasses
+        neededTimes = neededTimes.rename(columns={"Flight_Time_(s)": "time"})
+        neededTimes.to_csv("ReferencedFiles/massMapping.csv", index = None)
+        print("csv stuff finished!")
+
+
         try:
             # MotorOne.draw()
             # MotorOne.all_info()
 
             # Sp25.draw()
-            Sp25.all_info()
+            # Sp25.all_info()
 
             print("Center of mass without motor is currently set to: " + str(FlightParams.Parameters["the_center_of_mass_without_motor"]))
 
@@ -118,11 +127,16 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
                 rocket=Sp25, environment=env,rail_length = FlightParams.Parameters["rail_length"],inclination = setting["inclination"],
                 heading=setting["heading"], terminate_on_apogee = termOnApogee
             )
-            testFlight.info()
+            # testFlight.info()
             print("flgith complete1")
             inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env)
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])
+
+            print("\n\n\nMass function:")
+            print(Sp25.total_mass)
+            print("\n\n\n")
+
         except Exception as E:
             flightData[2] += str(E) + "\n" + str(export_flight_error(setting))
         # Register time

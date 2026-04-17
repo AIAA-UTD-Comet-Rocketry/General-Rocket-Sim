@@ -17,10 +17,12 @@ Parameters["varyingVariable"] = varyingPossibilities[2]
 
 Parameters["hasBottail"] = False
 
-Parameters["numberSims"] = 60
-Parameters["processes"] = 4
+Parameters["obtaining_motor_csv"] = True
 
-Parameters["fahrenheit_temp"] = 56
+Parameters["numberSims"] = 1
+Parameters["processes"] = 1
+
+Parameters["fahrenheit_temp"] = 57.6
 Parameters["envParams"] = {
     "latitude": 31.043722,
     "longitude": -103.532806,
@@ -49,7 +51,7 @@ Parameters["the_nozzle_position"] = Parameters["grainHeight"] * 4.25
 Parameters["grain_center_of_mass_position"] = 0
 Parameters["center_of_dry_mass_within_motor"] = 0
 Parameters["motor_thrust_file"] = "Test Burn Csv real.csv"
-Parameters["burn_time"] = 3.396
+Parameters["burn_time"] = 3.12
 Parameters["numGrains"] = 6
 Parameters["grainSeparation"] = .003175
 Parameters["motorLength"] = (Parameters["grainHeight"] + Parameters["grainSeparation"]) * Parameters["numGrains"] - Parameters["grainSeparation"]

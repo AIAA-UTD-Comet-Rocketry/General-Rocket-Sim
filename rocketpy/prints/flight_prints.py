@@ -390,7 +390,7 @@ class _FlightPrints:
             f"at {self.flight.min_stability_margin_time:.2f} s"
         )
 
-    def all(self):
+    def talall(self):
         """Prints out all data available about the Flight. This method invokes
         all other print methods in the class.
 
