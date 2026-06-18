@@ -11,7 +11,7 @@ import FlightParams
 import logging
 
 # Configure logging
-def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_cpu_time, termOnApogee, launchDate, obtainingMotorValue):
+def runFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, termOnApogee, launchDate, obtainingMotorValue):
     logging.basicConfig(
         filename='app.log',  # Change this to your desired log file
         level=logging.INFO,
@@ -19,16 +19,15 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
         filemode='a',  # 'w' for overwrite, 'a' for append
     )
     flightData = ["", "", ""]
-    env = Environment(latitude=FlightParams.Parameters["envParams"]["latitude"], longitude=FlightParams.Parameters["envParams"]["longitude"], elevation=FlightParams.Parameters["envParams"]["elevation"], date=launchDate)
-    # env.set_atmospheric_model(type=envParams["type"], file=envParams["file"], wind_u=FlightParams.Parameters["envParams"]["wind_u"], wind_v=FlightParams.Parameters["envParams"]["wind_v"])
+    env = Environment(latitude=FlightParams.Parameters["latitude"], longitude=FlightParams.Parameters["longitude"], elevation=FlightParams.Parameters["elevation"], date=FlightParams.Parameters["date"])
+    env.set_atmospheric_model(type=FlightParams.Parameters["type"], file=FlightParams.Parameters["file"], wind_u=FlightParams.Parameters["wind_u"], wind_v=FlightParams.Parameters["wind_v"], pressure=FlightParams.Parameters["pressure"])
     i=0
     
     settings = flight_settings(analysis_parameters, numOfSims)
 
     for setting in settings:
         start_time = process_time()
-        env.set_atmospheric_model(type=envParams["type"], file=envParams["file"], wind_u=setting["wind-u"], wind_v=setting["wind-v"])
-        # env.set_atmospheric_model(type=envParams["type"], pressure= setting["atmosphere_pressure"], temperature= setting["temperature"], wind_u= windArray_u(0,5), wind_v= windArray_v(0,5)) # Wind: (wind direction: 0 = North to South wind/90 = East to West wind, wind speed: m/s)
+        # env.set_atmospheric_model(type=envParams["type"], temperature =envParams["temperature"])
         MotorOne = SolidMotor(
             thrust_source="ReferencedFiles/" + FlightParams.Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
             burn_time = FlightParams.Parameters["burn_time"],#Straight from thrustcurve.org
@@ -61,8 +60,6 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
             power_off_drag ="ReferencedFiles/" + str(FlightParams.Parameters["power_off_file"]), #Uploaded to drive
             power_on_drag = "ReferencedFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
         )
-
-        print("Center of mass without motor is currently set to: " + str(FlightParams.Parameters["the_center_of_mass_without_motor"]))
 
         # CHANGE ONCE YOU FIND A GOOD WAY TO DO SO
         # Sp25.power_off_drag *= setting["power_off_drag"]
@@ -118,7 +115,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
             # MotorOne.draw()
             # MotorOne.all_info()
 
-            # Sp25.draw()
+            Sp25.draw()
             # Sp25.all_info()
 
             print("Center of mass without motor is currently set to: " + str(FlightParams.Parameters["the_center_of_mass_without_motor"]))
@@ -127,7 +124,9 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
                 rocket=Sp25, environment=env,rail_length = FlightParams.Parameters["rail_length"],inclination = setting["inclination"],
                 heading=setting["heading"], terminate_on_apogee = termOnApogee
             )
-            # testFlight.info()
+            print('printing ts crack')
+            testFlight.plots.trajectory_3d()
+            testFlight.info()
             print("flgith complete1")
             inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env)
             flightData[0] += "\n" + str(inputOutput[0])

@@ -1053,6 +1053,8 @@ class _FlightPlots:
         None
         """
 
+        print('bro this is dumb')
+
         print("\n\nTrajectory 3d Plot\n")
         self.trajectory_3d()
 

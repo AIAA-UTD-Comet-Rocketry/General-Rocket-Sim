@@ -4,6 +4,8 @@ from rocketpy.mathutils.function import Function
 from rocketpy.motors import motor
 import numpy as np
 import pandas as pd
+import requests
+from GetWeatherData import GetWeatherData
 
 # HERE ARE THE VARIABLES YOU WILL HAVE TO CHANGE
 
@@ -21,17 +23,31 @@ Parameters["obtaining_motor_csv"] = True
 
 Parameters["numberSims"] = 1
 Parameters["processes"] = 1
+Parameters["latitude"] = 31.043722
+Parameters["longitude"] = -103.532806
 
-Parameters["fahrenheit_temp"] = 57.6
-Parameters["envParams"] = {
-    "latitude": 31.043722,
-    "longitude": -103.532806,
-    "elevation": 915,
-    "type": "custom_atmosphere",
-    "wind_u": 1.5,
-    "wind_v": 1.5,
-    "file": "ECMWF"
-}
+# elevation was 750 meters
+
+url = f"https://openzenith.cyopsys.com/api/elevation?lat={Parameters["latitude"]}&lon={Parameters["longitude"]}"
+returnedData = requests.get(url, timeout=10).json()
+print(returnedData["elevation"])
+
+Parameters["elevation"] = returnedData["elevation"]
+Parameters["type"] = "custom_atmosphere"
+Parameters["file"] = None
+
+
+Parameters["fahrenheit_temp"] = None
+Parameters["pressure"] = None
+Parameters["wind_u"] = None
+Parameters["wind_v"] = None
+
+# (year, month, day, hour)
+Parameters["date"] = (2026, 6, 17, 12)
+
+
+if(Parameters["type"] == "custom_atmosphere"):
+    Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
 
 
 
@@ -41,7 +57,7 @@ Parameters["generatedFilesLocation"] = "IrecSims/"
 
 #motor
 Parameters["dryMotorMass"] = 4.85
-Parameters["propellant_mass"] = 9.26 -4.85
+Parameters["propellant_mass"] = 9.256 - 4.853
 Parameters["grainInnerRadius"] = .02
 Parameters["grainOuterRadius"] = .04
 Parameters["grainHeight"] = 0.127
@@ -50,18 +66,18 @@ Parameters["the_throat_radius"] = .02286
 Parameters["the_nozzle_position"] = Parameters["grainHeight"] * 4.25
 Parameters["grain_center_of_mass_position"] = 0
 Parameters["center_of_dry_mass_within_motor"] = 0
-Parameters["motor_thrust_file"] = "Test Burn Csv real.csv"
-Parameters["burn_time"] = 3.12
+Parameters["motor_thrust_file"] = "FUUUUCK.eng"
+Parameters["burn_time"] = 3.35
 Parameters["numGrains"] = 6
 Parameters["grainSeparation"] = .003175
-Parameters["motorLength"] = (Parameters["grainHeight"] + Parameters["grainSeparation"]) * Parameters["numGrains"] - Parameters["grainSeparation"]
-Parameters["the_motor_position"] = 2.59
+Parameters["motorLength"] = .914
+Parameters["the_motor_position"] = 2.204 + .914/2
 
 #rocket general
-Parameters["spMass"] = 13.9
+Parameters["spMass"] = 14.953
 Parameters["rocket_radius"] = 0.154686/2
-Parameters["spLength"] = 0.889+1.19+0.152
-Parameters["the_center_of_mass_without_motor"] = 1.6
+Parameters["spLength"] = 3.08
+Parameters["the_center_of_mass_without_motor"] = 1.58
 Parameters["rocket_center_of_dry_mass_position"] = Parameters["the_center_of_mass_without_motor"]
 Parameters["power_off_file"] = "2026LSCCDOFF.csv"
 Parameters["power_on_file"] = "2026LSCCDON.csv"
@@ -96,9 +112,9 @@ if(Parameters["hasBottail"]):
 # Parameters["lightTrigger"] = 450
 
 #rail buttons
-Parameters["lower_railbutton_position"] = 2.79
-Parameters["upper_railbutton_position"] = 1.96
-Parameters["railbutton_angular_position"] = 130
+Parameters["lower_railbutton_position"] = 3.01
+Parameters["upper_railbutton_position"] = 3.01 - 0.952
+Parameters["railbutton_angular_position"] = 150
 
 
 #environment
@@ -144,7 +160,6 @@ print("YOU MUST STILL FILL IN THE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
 with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
     jsonData = json.load(f)
-print("Fin position is currently set to: " + str(jsonData["fin_position"]))
 for key in Parameters:
     # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
     # or something like that
@@ -194,7 +209,6 @@ Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["rocke
 
 Parameters["power_off"] = 1
 Parameters["power_on"] = 1
-Parameters["kelvin_temp"] = (Parameters["fahrenheit_temp"] - 32) * 5/9 + 273.15
 Parameters["nose_position"] = 0
 
 def getPitch(q):
@@ -342,4 +356,15 @@ def airbrake_controller_function(time, sampling_rate, state, state_history, obse
         air_brakes.drag_coefficient(air_brakes.deployment_level, mach_number),
     )
 
+def calcKelvinfromFahrenheit(fTemp):
+    return (fTemp - 32) * 5/9 + 273.15
+
 Parameters["airbrake_controller_function"] = airbrake_controller_function
+
+newTempArr = []
+if isinstance(Parameters["fahrenheit_temp"], float):
+    Parameters["temperature"] = calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"])
+else:
+    for i in range(0, len(Parameters["fahrenheit_temp"]), 1):
+        newTempArr.append((Parameters["fahrenheit_temp"][i][0], calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"][i][1])))
+    Parameters["temperature"] = newTempArr

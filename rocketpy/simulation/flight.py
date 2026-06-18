@@ -3409,7 +3409,7 @@ class Flight:
 
     def info(self):
         """Prints out a summary of the data available about the Flight."""
-        self.prints.all()
+        self.prints.talall()
 
     def all_info(self):
         """Prints out all data and graphs available about the Flight."""

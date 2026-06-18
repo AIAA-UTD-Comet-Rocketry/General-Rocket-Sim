@@ -26,8 +26,8 @@ params = {
 	"hourly": ["wind_speed_10m", "wind_speed_100m", "wind_speed_925hPa", "wind_speed_850hPa", "wind_speed_700hPa", "wind_direction_10m",  "wind_direction_100m", "wind_direction_925hPa", "wind_direction_850hPa", "wind_direction_700hPa"],
 	"models": "ecmwf_ifs025",
     "timezone": "America/Chicago",
-	"start_date": "2025-05-32",
-	"end_date": "2025-05-32"
+	"start_date": "2026-06-18",
+	"end_date": "2026-06-18"
 }
 responses = openmeteo.weather_api(url, params=params)
 
@@ -75,4 +75,4 @@ hourly_data["wind_direction_700hPa"] = hourly_wind_direction_700hPa
 hourly_dataframe = pd.DataFrame(data = hourly_data)
 print(hourly_dataframe)
 
-hourly_dataframe.to_csv("WallahiThisBetterWork.csv", index=False)
+hourly_dataframe.to_csv("ReferencedFiles/WallahiThisBetterWork.csv", index=False)
