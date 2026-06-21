@@ -43,7 +43,7 @@ Parameters["wind_u"] = None
 Parameters["wind_v"] = None
 
 # (year, month, day, hour)
-Parameters["date"] = (2026, 6, 17, 12)
+Parameters["date"] = (2026, 6, 20, 14)
 
 
 if(Parameters["type"] == "custom_atmosphere"):
@@ -120,8 +120,8 @@ Parameters["railbutton_angular_position"] = 150
 #environment
 
 #final rocket stuff
-Parameters["inclination"] = 88
-Parameters["heading"] = 315
+Parameters["inclination"] = 84
+Parameters["heading"] = 240
 Parameters["rail_length"] = 7.096
 
 #airbrakes
