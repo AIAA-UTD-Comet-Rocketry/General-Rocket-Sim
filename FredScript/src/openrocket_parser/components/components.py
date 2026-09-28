@@ -335,7 +335,7 @@ class MassComponent(Subcomponent):
 
     def getDictVals(self) -> dict:        
         return {
-                f"addedMass_{self.id}": self.overridemass,
+                f"addedMass_{self.id}": self.mass,
             }
 
 @register_component('innertube')
