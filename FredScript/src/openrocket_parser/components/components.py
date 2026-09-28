@@ -298,7 +298,9 @@ class RailButton(Subcomponent):
             f"rail_{self.rail_id}_position": self.position,
             f"rail_{self.rail_id}_positionType": self.railbutton_positionType,
             f"rail_{self.rail_id}_angle": self.angleoffset,
-            f"rail_{self.rail_id}_mass": self.overridemass
+            f"rail_{self.rail_id}_mass": self.overridemass,
+            f"rail_{self.rail_id}_count": self.instancecount,
+            f"rail_{self.rail_id}_separation": self.separation
         }
     
 @register_component('motorconfiguration')
