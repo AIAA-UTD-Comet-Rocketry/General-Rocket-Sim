@@ -4,7 +4,7 @@ BodyTube Component related functionality
 
 
 from xml.etree.ElementTree import Element
-
+import math
 from openrocket_parser.components.components import (
     XMLComponent, register_component, Subcomponent, component_factory
 )
@@ -18,7 +18,8 @@ class BodyTube(Subcomponent):
     _FIELDS = [
         ('id', './id', str, 'none'),
         ('length', './length', XMLComponent.get_float, 0),
-        ('mass', './overridemass', XMLComponent.get_float, 0)
+        ('mass', './overridemass', XMLComponent.get_float, 0),
+        ('radius', './radius', XMLComponent.get_float, 0)
     ]
 
 
@@ -30,9 +31,14 @@ class BodyTube(Subcomponent):
             self.motormount = component_factory(motor_mount_element, element)
 
     def getDictVals(self) -> dict:
+        density = int(float(self.bbodyTube_density))
+
+        alt_mass = density * math.pi * self.length * (self.radius ** 2 - (self.radius - self.thickness) ** 2)
+        
         return {
             "rocket_radius": self.radius,
             f"bodyTube_{self.id}_length": self.length,
             f"bodyTube_{self.id}_mass": self.mass,
-            f"bodyTube_{self.id}_length": self.length
+            f"bodyTube_{self.id}_altMass": alt_mass if self.mass == 0 else 0,
+            f"bodyTube_{self.id}_density": density
         }

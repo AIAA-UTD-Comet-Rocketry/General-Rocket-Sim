@@ -2,6 +2,7 @@
 Components collects a
 """
 
+import math
 import logging
 from typing import Type, List
 from xml.etree.ElementTree import Element
@@ -98,12 +99,22 @@ class XMLComponent(ABC):
                 print(f"Bodytube path is {path}, attribute name is {attr_name}")
                 actualElement = self.element.find(path)
                 id = actualElement.attrib.get("id")
+
+                if(attr_name == "material"):
+                    density = actualElement.attrib.get("density")
+                    setattr(self, f"bbodyTube_density", density)
+
                 setattr(self, f"bbodyTube_{id}_Number", XMLComponent.bodyTubeNumbah)
                 XMLComponent.bodyTubeNumbah += 1
         elif(elemName == "trapezoidfinset"):
             parentId = self.parent.get("id")            
             if parentId is not None:
                 setattr(self, "finsParentId", parentId)
+        elif(elemName == "tubecoupler"):
+            if(attr_name == "material"):
+                actualElement = self.element.find(path)
+                density = actualElement.attrib.get("density")
+                setattr(self, f"coupler_density", density)
 
         """Finds text in XML, converts it, and sets it as an attribute."""
         raw_value = self.element.findtext(path)
@@ -231,8 +242,11 @@ class TubeCoupler(Subcomponent):
     ]
 
     def getDictVals(self) -> dict:
+        density = int(float(self.coupler_density))
+        alt_mass = density * math.pi * self.length * (self.outerradius ** 2 - (self.outerradius - self.thickness) ** 2)
         return {
             f"coupler_{self.id}_mass": self.overridemass,
+            f"coupler_{self.id}_altMass": alt_mass if self.overridemass == 0 else 0
         }
 
 @register_component('parachute')

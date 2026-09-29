@@ -27,17 +27,27 @@ Parameters["latitude"] = 31.043722
 Parameters["longitude"] = -103.532806
 
 # elevation was 750 meters
+'''
+url = f"https://openzenith.cyopsys.com/api/elevation?lat={Parameters['latitude']}&lon={Parameters['longitude']}"
+response = requests.get(url, timeout=10)
+print("URL:", response.url)
+print("Status:", response.status_code)
+print("Content-Type:", response.headers.get("Content-Type"))
+print("Response:", repr(response.text[:1000]))
 
-url = f"https://openzenith.cyopsys.com/api/elevation?lat={Parameters["latitude"]}&lon={Parameters["longitude"]}"
-returnedData = requests.get(url, timeout=10).json()
+returnedData = response.json()
+
 print(returnedData["elevation"])
 
 Parameters["elevation"] = returnedData["elevation"]
-Parameters["type"] = "custom_atmosphere"
+'''
+Parameters["elevation"] = 750
+
+Parameters["type"] = "standard_atmosphere"
 Parameters["file"] = None
 
 
-Parameters["fahrenheit_temp"] = None
+Parameters["fahrenheit_temp"] = 67
 Parameters["pressure"] = None
 Parameters["wind_u"] = None
 Parameters["wind_v"] = None
@@ -362,7 +372,7 @@ def calcKelvinfromFahrenheit(fTemp):
 Parameters["airbrake_controller_function"] = airbrake_controller_function
 
 newTempArr = []
-if isinstance(Parameters["fahrenheit_temp"], float):
+if isinstance(Parameters["fahrenheit_temp"], float) or isinstance(Parameters["fahrenheit_temp"], int):
     Parameters["temperature"] = calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"])
 else:
     for i in range(0, len(Parameters["fahrenheit_temp"]), 1):
