@@ -1,0 +1,3 @@
+[submodule "rocketpy_repo"]
+    path = rocketpy_repo
+    url = https://github.com/RocketPy-Team/RocketPy.git
