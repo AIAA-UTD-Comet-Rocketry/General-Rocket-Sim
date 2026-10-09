@@ -6,3 +6,6 @@ requests
 pytz
 simplekml
 dill
+ipykernel
+pandas
+-e ./rocketpy_repo
