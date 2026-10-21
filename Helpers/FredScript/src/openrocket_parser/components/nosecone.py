@@ -1,0 +1,26 @@
+"""
+NoseCone functionality for generic nosecones. Each shape of nosecone may extend this one if it needs
+to read completely different fields
+"""
+
+from HelperFiles.FredScript.src.openrocket_parser.components.components import XMLComponent, register_component, Subcomponent
+
+
+@register_component('nosecone')
+class NoseCone(Subcomponent):
+    """
+    NoseCone Subcomponent from OpenRocket, created when a nosecone xml element is found
+    """
+    _FIELDS = [
+        ('shape', './/shape', str, 'ogive'),
+        ('length', './/length', XMLComponent.get_float, 0),
+        ('mass', './/overridemass', XMLComponent.get_float, 0)
+    ]
+
+    def getDictVals(self) -> dict:
+        return {
+            "nose_cone_type": self.shape,
+            "nose_cone_length": self.length,
+            "nose_mass": self.mass
+        }
+
