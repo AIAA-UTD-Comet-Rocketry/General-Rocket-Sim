@@ -7,5 +7,9 @@ pytz
 simplekml
 dill
 ipykernel
+openmeteo_requests
+retry_requests
+requests_cache
 pandas
 -e ./rocketpy_repo
+-e .

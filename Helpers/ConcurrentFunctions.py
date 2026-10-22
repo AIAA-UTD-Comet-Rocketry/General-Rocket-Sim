@@ -1,13 +1,8 @@
 from rocketpy import Environment, SolidMotor, Rocket, Flight
-
 from numpy.random import normal, choice
 from time import process_time
-import numpy as np
 import pandas as pd
-from Helpers.wind import windArray_u, windArray_v
-
-import Helpers.FlightParams as FlightParams
-
+from Helpers import FlightParams
 import logging
 
 # Configure logging
