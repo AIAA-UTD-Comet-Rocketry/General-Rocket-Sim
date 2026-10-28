@@ -43,8 +43,19 @@ def RunFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, te
             dry_inertia=(FlightParams.Parameters["motor_11_inertia"], FlightParams.Parameters["motor_11_inertia"], FlightParams.Parameters["motor_33_inertia"]), #based off drawing
             center_of_dry_mass_position= FlightParams.Parameters["center_of_dry_mass_within_motor"],
         )
-
         #Pretty Much done except grain density and maybe nozz)le position
+
+
+        print("Thrust source:", MotorOne.thrust_source)
+        print("Total impulse:", MotorOne.total_impulse)
+        print("Burn time:", MotorOne.burn_time)
+
+        for t in [0, 0.1, 1, 3, 3.35]:
+            print(f"Thrust at {t}s:", MotorOne.thrust(t))
+
+        # Inspect the underlying thrust-curve data
+        print("Thrust curve data:")
+        print(MotorOne.thrust.source)
 
         Sp25 = Rocket(
             mass = setting["rocket_mass"], #OpenRocket
@@ -55,6 +66,7 @@ def RunFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, te
             power_off_drag ="../InputFiles/" + str(FlightParams.Parameters["power_off_file"]), #Uploaded to drive
             power_on_drag = "../InputFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
         )
+
 
         # CHANGE ONCE YOU FIND A GOOD WAY TO DO SO
         # Sp25.power_off_drag *= setting["power_off_drag"]

@@ -87,7 +87,7 @@ Parameters["the_motor_position"] = 2.204 + .614/2
 Parameters["spMass"] = 14.953
 Parameters["rocket_radius"] = 0.154686/2
 Parameters["spLength"] = 3.08
-Parameters["the_center_of_mass_without_motor"] = 1.58
+Parameters["the_center_of_mass_without_motor"] = 1.8
 Parameters["rocket_center_of_dry_mass_position"] = Parameters["the_center_of_mass_without_motor"]
 Parameters["power_off_file"] = "2026LSCCDOFF.csv"
 Parameters["power_on_file"] = "2026LSCCDON.csv"
@@ -209,10 +209,14 @@ Parameters["motor_33_inertia"] = ((1/4)*Parameters["dryMotorMass"]*(Parameters["
 Parameters["the_motor_center_of_dry_mass_position"] = Parameters["the_motor_position"]
 
 _, _, points = motor.Motor.import_eng("../InputFiles/" + Parameters["motor_thrust_file"])
-thrust_source = points
+points = np.asarray(points, dtype=float)
+_, unique_indices = np.unique(points[:, 0], return_index=True)
+points = points[np.sort(unique_indices)].tolist()
 interpolation_method = "linear"
-thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")
+thrust = Function(points, "Time (s)", "Thrust (N)", interpolation_method, "zero")
 Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
+
+print(f"Impulse is: {Parameters['impulse']}")
 
 Parameters["spCentralAxis"] = (Parameters["rocket_radius"]**2)*Parameters["spMass"]*1/2
 Parameters["spCentralDiameter"] = ((1/4)*Parameters["spMass"]*(Parameters["rocket_radius"])**2) + (1/12)*Parameters["spMass"]*(Parameters["spLength"])**2
