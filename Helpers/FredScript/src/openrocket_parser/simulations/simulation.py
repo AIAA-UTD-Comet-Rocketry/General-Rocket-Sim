@@ -6,7 +6,7 @@ from typing import Dict, Any, List
 
 import pandas as pd
 
-from HelperFiles.FredScript.src.openrocket_parser.simulations.simulation_data import FlightEvent
+from .simulation_data import FlightEvent
 
 
 @dataclass

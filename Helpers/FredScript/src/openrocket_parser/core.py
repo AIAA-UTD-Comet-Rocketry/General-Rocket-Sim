@@ -5,7 +5,7 @@ import logging
 from typing import Optional
 import xml.etree.ElementTree as ET
 
-from HelperFiles.FredScript.src.openrocket_parser.components.rocket import Rocket
+from .components.rocket import Rocket
 
 
 def load_rocket_from_xml(file_path: str) -> (Rocket, dict):

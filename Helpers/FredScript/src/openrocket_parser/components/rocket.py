@@ -5,7 +5,7 @@ and all other components and subcomponents will be within the Rocket
 
 from xml.etree.ElementTree import Element
 
-from HelperFiles.FredScript.src.openrocket_parser.components.components import register_component, XMLComponent, component_factory
+from .components import register_component, XMLComponent, component_factory
 
 import HelperFiles.FredScript.src.openrocket_parser.components.bodytube
 import HelperFiles.FredScript.src.openrocket_parser.components.finset

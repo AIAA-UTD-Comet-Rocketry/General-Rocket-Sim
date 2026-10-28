@@ -13,3 +13,4 @@ requests_cache
 pandas
 -e ./rocketpy_repo
 -e .
+-e "./Helpers/FredScript"
