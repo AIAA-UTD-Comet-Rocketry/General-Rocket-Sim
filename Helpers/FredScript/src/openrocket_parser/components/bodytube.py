@@ -5,7 +5,7 @@ BodyTube Component related functionality
 
 from xml.etree.ElementTree import Element
 import math
-from HelperFiles.FredScript.src.openrocket_parser.components.components import (
+from .components import (
     XMLComponent, register_component, Subcomponent, component_factory
 )
 

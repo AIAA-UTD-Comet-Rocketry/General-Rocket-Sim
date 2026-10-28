@@ -169,7 +169,7 @@ def getAverageWindPerWeekFromHour(hour):
     return getFinalWindFromWeatherDictionary(weatherData)
 
 # Now Obsolete
-def makeWind(day, hour):    
+def MakeWind(day, hour):    
     month = datetime.now().month
     weather = getWeatherFromApi(month, day, hour)
     return getFinalWindFromWeatherDictionary(weather)

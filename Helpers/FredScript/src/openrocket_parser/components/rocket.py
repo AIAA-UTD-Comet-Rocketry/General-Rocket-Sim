@@ -7,11 +7,7 @@ from xml.etree.ElementTree import Element
 
 from .components import register_component, XMLComponent, component_factory
 
-import HelperFiles.FredScript.src.openrocket_parser.components.bodytube
-import HelperFiles.FredScript.src.openrocket_parser.components.finset
-import HelperFiles.FredScript.src.openrocket_parser.components.motor
-import HelperFiles.FredScript.src.openrocket_parser.components.nosecone
-import HelperFiles.FredScript.src.openrocket_parser.components.stage
+from . import bodytube, finset, motor, nosecone, stage
 
 @register_component('rocket')
 class Rocket(XMLComponent):

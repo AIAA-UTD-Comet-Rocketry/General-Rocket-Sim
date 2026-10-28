@@ -5,7 +5,7 @@ Stage Component related functionality
 from typing import List
 from xml.etree.ElementTree import Element
 
-from HelperFiles.FredScript.src.openrocket_parser.components.components import register_component, XMLComponent, component_factory
+from .components import register_component, XMLComponent, component_factory
 
 
 @register_component('stage')

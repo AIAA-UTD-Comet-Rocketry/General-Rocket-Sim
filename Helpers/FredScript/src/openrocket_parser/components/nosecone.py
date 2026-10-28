@@ -3,7 +3,7 @@ NoseCone functionality for generic nosecones. Each shape of nosecone may extend 
 to read completely different fields
 """
 
-from HelperFiles.FredScript.src.openrocket_parser.components.components import XMLComponent, register_component, Subcomponent
+from .components import XMLComponent, register_component, Subcomponent
 
 
 @register_component('nosecone')

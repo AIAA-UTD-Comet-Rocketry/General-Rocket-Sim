@@ -43,8 +43,8 @@ Parameters["elevation"] = returnedData["elevation"]
 '''
 Parameters["elevation"] = 750
 
-Parameters["type"] = "standard_atmosphere"
-Parameters["file"] = None
+Parameters["atmosphere_type"] = "standard_atmosphere"
+Parameters["env_file"] = None
 
 
 Parameters["fahrenheit_temp"] = 67
@@ -56,13 +56,13 @@ Parameters["wind_v"] = None
 Parameters["date"] = (2026, 6, 20, 14)
 
 
-if(Parameters["type"] == "custom_atmosphere"):
+if(Parameters["atmosphere_type"] == "custom_atmosphere"):
     Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
 
 
 
 
-Parameters["generatedFilesLocation"] = "IrecSims/"
+Parameters["generatedFilesLocation"] = "../Output"
 
 
 #motor
@@ -81,7 +81,7 @@ Parameters["burn_time"] = 3.35
 Parameters["numGrains"] = 6
 Parameters["grainSeparation"] = .003175
 Parameters["motorLength"] = .914
-Parameters["the_motor_position"] = 2.204 + .914/2
+Parameters["the_motor_position"] = 2.204 + .614/2
 
 #rocket general
 Parameters["spMass"] = 14.953
@@ -137,7 +137,7 @@ Parameters["rail_length"] = 7.096
 #airbrakes
 Parameters["using-airbrakes"] = False
 if(Parameters["using-airbrakes"]):
-    Parameters["air_brake_drag"] = "ReferencedFiles/air_brake_drag_full.csv"
+    Parameters["air_brake_drag"] = "InputFiles/air_brake_drag_full.csv"
     Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
     Parameters["airbrake_clamp"] = True
     Parameters["override_rocketdrag_with_airbrakedrag"] = True
@@ -145,7 +145,7 @@ if(Parameters["using-airbrakes"]):
 
 # Parameters["halfway_to_target"] = 1524
 
-lookupTable = "./ReferencedFiles/FinalLookupTable.csv"
+lookupTable = "../InputFiles/FinalLookupTable.csv"
 
 # vel range is 0, 275
 
@@ -165,10 +165,10 @@ Parameters["parachutes"] = {}
 
 
 
-print("YOU MUST STILL FILL IN THE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
+print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
 
-with open("ReferencedFiles/RelevantOpenRocket.json", "r") as f:
+with open("../InputFiles/RelevantOpenRocket.json", "r") as f:
     jsonData = json.load(f)
 for key in Parameters:
     # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
@@ -208,7 +208,7 @@ Parameters["motor_density"] = Parameters["propellant_mass"]/Parameters["motor_vo
 Parameters["motor_33_inertia"] = ((1/4)*Parameters["dryMotorMass"]*(Parameters["grainOuterRadius"])**2) + (1/12)*Parameters["dryMotorMass"]*(Parameters["motorLength"])**2
 Parameters["the_motor_center_of_dry_mass_position"] = Parameters["the_motor_position"]
 
-_, _, points = motor.Motor.import_eng("ReferencedFiles/" + Parameters["motor_thrust_file"])
+_, _, points = motor.Motor.import_eng("../InputFiles/" + Parameters["motor_thrust_file"])
 thrust_source = points
 interpolation_method = "linear"
 thrust = Function(thrust_source, "Time (s)", "Thrust (N)", interpolation_method, "zero")

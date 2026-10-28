@@ -4,7 +4,7 @@ All Motor related functionality to represent OpenRocket motors and motor related
 
 from xml.etree.ElementTree import Element
 
-from HelperFiles.FredScript.src.openrocket_parser.components.components import register_component, XMLComponent, component_factory
+from .components import register_component, XMLComponent, component_factory
 
 
 @register_component('motor')

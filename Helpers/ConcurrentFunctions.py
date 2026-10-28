@@ -6,7 +6,7 @@ from Helpers import FlightParams
 import logging
 
 # Configure logging
-def runFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, termOnApogee, launchDate, obtainingMotorValue):
+def RunFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, termOnApogee, launchDate):
     logging.basicConfig(
         filename='app.log',  # Change this to your desired log file
         level=logging.INFO,
@@ -15,16 +15,16 @@ def runFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, te
     )
     flightData = ["", "", ""]
     env = Environment(latitude=FlightParams.Parameters["latitude"], longitude=FlightParams.Parameters["longitude"], elevation=FlightParams.Parameters["elevation"], date=FlightParams.Parameters["date"])
-    env.set_atmospheric_model(type=FlightParams.Parameters["type"], file=FlightParams.Parameters["file"], wind_u=FlightParams.Parameters["wind_u"], wind_v=FlightParams.Parameters["wind_v"], pressure=FlightParams.Parameters["pressure"])
+    env.set_atmospheric_model(type=FlightParams.Parameters["atmosphere_type"], file=FlightParams.Parameters["env_file"], wind_u=FlightParams.Parameters["wind_u"], wind_v=FlightParams.Parameters["wind_v"], pressure=FlightParams.Parameters["pressure"])
     i=0
     
     settings = flight_settings(analysis_parameters, numOfSims)
 
     for setting in settings:
         start_time = process_time()
-        # env.set_atmospheric_model(type=envParams["type"], temperature =envParams["temperature"])
+        # env.set_atmospheric_model(type=envParams["atmosphere_type"], temperature =envParams["temperature"])
         MotorOne = SolidMotor(
-            thrust_source="ReferencedFiles/" + FlightParams.Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
+            thrust_source="../InputFiles/" + FlightParams.Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
             burn_time = FlightParams.Parameters["burn_time"],#Straight from thrustcurve.org
             reshape_thrust_curve=(FlightParams.Parameters["burn_time"], setting["impulse"]),
             nozzle_radius= setting["nozzle_radius"], # Part List
@@ -52,8 +52,8 @@ def runFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, te
             inertia = (FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralAxis"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
             center_of_mass_without_motor = FlightParams.Parameters["the_center_of_mass_without_motor"], # OpenRocket
-            power_off_drag ="ReferencedFiles/" + str(FlightParams.Parameters["power_off_file"]), #Uploaded to drive
-            power_on_drag = "ReferencedFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
+            power_off_drag ="../InputFiles/" + str(FlightParams.Parameters["power_off_file"]), #Uploaded to drive
+            power_on_drag = "../InputFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
         )
 
         # CHANGE ONCE YOU FIND A GOOD WAY TO DO SO
@@ -98,12 +98,14 @@ def runFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, te
                 trigger = parachute["trigger"]
             )
 
-        neededTimes = pd.read_csv("ReferencedFiles/requiredSampleTimes.csv", header = 0)
+        '''
+        neededTimes = pd.read_csv("..InputFiles/requiredSampleTimes.csv", header = 0)
         sampledMasses = [Sp25.total_mass(t) for t in neededTimes["Flight_Time_(s)"].to_numpy()]
         neededTimes["mass"] = sampledMasses
         neededTimes = neededTimes.rename(columns={"Flight_Time_(s)": "time"})
-        neededTimes.to_csv("ReferencedFiles/massMapping.csv", index = None)
+        neededTimes.to_csv("..InputFiles/massMapping.csv", index = None)
         print("csv stuff finished!")
+        '''
 
 
         try:

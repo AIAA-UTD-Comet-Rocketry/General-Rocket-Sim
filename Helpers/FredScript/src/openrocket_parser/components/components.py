@@ -405,6 +405,7 @@ class TrapezoidFinSet(Subcomponent):
     ]
 
     def getDictVals(self) -> dict:
+        print(f"Alright, the value is {self.trapezoidfinset_positionType}")
         return {
             "fin_sweep_length": self.sweeplength,
             "fin_cant_angle": self.cant,

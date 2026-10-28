@@ -1,7 +1,7 @@
 """
 FinSet related functionality
 """
-from HelperFiles.FredScript.src.openrocket_parser.components.components import register_component, Subcomponent, XMLComponent
+from .components import register_component, Subcomponent, XMLComponent
 
 
 @register_component('finset')

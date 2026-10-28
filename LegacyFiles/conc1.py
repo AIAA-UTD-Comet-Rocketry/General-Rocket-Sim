@@ -20,7 +20,7 @@ def runFlightWithMonteCarlo(numOfSims, envParams, analysis_parameters, initial_c
         start_time = process_time()
         
         numGrain = 5
-        env.set_atmospheric_model(type=envParams["type"], pressure= setting["atmosphere_pressure"], temperature= setting["temperature"], wind_u= setting["wind_u_speed"], wind_v= setting["wind_v_speed"])
+        env.set_atmospheric_model(type=envParams["atmosphere_type"], pressure= setting["atmosphere_pressure"], temperature= setting["temperature"], wind_u= setting["wind_u_speed"], wind_v= setting["wind_v_speed"])
         MotorOne = SolidMotor(
             thrust_source="thrustcurve.csv", #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
             burn_time = 2.505,#Straight from thrustcurve.org
