@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 import logging
 from scipy.stats import norm
 from matplotlib import pyplot as plt
@@ -17,9 +17,12 @@ from Helpers.GetWeatherData import GetWeatherData
 
 Parameters = {}
 
+Parameters["day"] = date.today()
+Parameters["hour"] = 14
+
 #Non Rocket Parameters
-varyingPossibilities = ["Fin Position", "Hour", "Day"]
-varyingPossibilitiesKeyMapping = ["fin_position", "hour", "day"]
+varyingPossibilitiesName = ["Fin Position", "Day", "Hour"]
+varyingPossibilitiesKeyMapping = ["fin_position", "day", "hour"]
 
 # put the start end range (inclusive), then the # of elements you want in between them
 varyingRanges = [
@@ -28,8 +31,29 @@ varyingRanges = [
     [5, 15, 11]
 ]
 
+for i in range(len(varyingRanges)):
+    varyingRanges[i] = np.linspace(*varyingRanges[i])
+    if varyingPossibilitiesKeyMapping[i] == "day":
+        for j in range(len(varyingRanges[i])):
+            trueDate = Parameters["day"] + timedelta(days = varyingRanges[i][j])
+            varyingRanges[i][j] = [trueDate.year, trueDate.month, trueDate.day]
 
-Parameters["iterative_variables"] = [varyingPossibilities[2], varyingPossibilities[1]]
+
+Parameters["iterative_variables"] = ["Day", "Hour"]
+
+trueNames = []
+trueRanges = []
+trueCurrentIndices = []
+
+for i in range(Parameters["iterative_variables"]):
+    try:
+        trueIndex = varyingPossibilitiesName.index(Parameters["iterative_variables"][i])
+        trueNames.append(varyingPossibilitiesName[trueIndex])
+        trueRanges.append(varyingRanges[trueIndex])
+        trueCurrentIndices.append(0)
+    except ValueError():
+        print("element not found! abort immedietly!")
+        raise SystemExit
 
 Parameters["hasBottail"] = False
 
@@ -67,8 +91,6 @@ Parameters["wind_u"] = None
 Parameters["wind_v"] = None
 
 # (year, month, day, hour)
-Parameters["day"] = date.today()
-Parameters["hour"] = 14
 
 if(Parameters["atmosphere_type"] == "custom_atmosphere"):
     Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
