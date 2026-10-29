@@ -1,3 +1,4 @@
+from datetime import date
 import logging
 from scipy.stats import norm
 from matplotlib import pyplot as plt
@@ -17,10 +18,18 @@ from Helpers.GetWeatherData import GetWeatherData
 Parameters = {}
 
 #Non Rocket Parameters
-varyingPossibilities = ["airbrake", "finposition", "weatherHour"]
+varyingPossibilities = ["Fin Position", "Hour", "Day"]
+varyingPossibilitiesKeyMapping = ["fin_position", "hour", "day"]
+
+# put the start end range (inclusive), then the # of elements you want in between them
+varyingRanges = [
+    [2.67, 2.92, 11],
+    [0, 7, 8],
+    [5, 15, 11]
+]
 
 
-Parameters["varyingVariable"] = varyingPossibilities[2]
+Parameters["iterative_variables"] = [varyingPossibilities[2], varyingPossibilities[1]]
 
 Parameters["hasBottail"] = False
 
@@ -58,8 +67,8 @@ Parameters["wind_u"] = None
 Parameters["wind_v"] = None
 
 # (year, month, day, hour)
-Parameters["date"] = (2026, 6, 20, 14)
-
+Parameters["day"] = date.today()
+Parameters["hour"] = 14
 
 if(Parameters["atmosphere_type"] == "custom_atmosphere"):
     Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
@@ -586,3 +595,6 @@ def setup_logging():
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+def SetNewValuesForIteration(nextIndex):
+    for 
