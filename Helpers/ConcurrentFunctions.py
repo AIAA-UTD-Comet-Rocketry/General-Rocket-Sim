@@ -6,7 +6,7 @@ from Helpers import FlightParams
 import logging
 
 # Configure logging
-def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDate):
+def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, launchDate):
     logging.basicConfig(
         filename='app.log',  # Change this to your desired log file
         level=logging.INFO,
@@ -17,7 +17,9 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDat
     env = Environment(latitude=FlightParams.Parameters["latitude"], longitude=FlightParams.Parameters["longitude"], elevation=FlightParams.Parameters["elevation"], date=FlightParams.Parameters["date"])
     env.set_atmospheric_model(type=FlightParams.Parameters["atmosphere_type"], file=FlightParams.Parameters["env_file"], wind_u=FlightParams.Parameters["wind_u"], wind_v=FlightParams.Parameters["wind_v"], pressure=FlightParams.Parameters["pressure"])
     i=0
-    
+
+    if not FlightParams.Parameters["doing_monte_carlo"]:
+        numOfSims = 1
     settings = flight_settings(FlightParams.Parameters["monte_carlo_parameters"], numOfSims)
 
     for setting in settings:
@@ -45,18 +47,6 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDat
         )
         #Pretty Much done except grain density and maybe nozz)le position
 
-
-        print("Thrust source:", MotorOne.thrust_source)
-        print("Total impulse:", MotorOne.total_impulse)
-        print("Burn time:", MotorOne.burn_time)
-
-        for t in [0, 0.1, 1, 3, 3.35]:
-            print(f"Thrust at {t}s:", MotorOne.thrust(t))
-
-        # Inspect the underlying thrust-curve data
-        print("Thrust curve data:")
-        print(MotorOne.thrust.source)
-
         Sp25 = Rocket(
             mass = setting["rocket_mass"], #OpenRocket
             radius = FlightParams.Parameters["rocket_radius"], #OpenRocket
@@ -67,10 +57,6 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDat
             power_on_drag = "../InputFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
         )
 
-
-        # CHANGE ONCE YOU FIND A GOOD WAY TO DO SO
-        # Sp25.power_off_drag *= setting["power_off_drag"]
-        # Sp25.power_on_drag *= setting["power_on_drag"]
 
         nose_cone = Sp25.add_nose(
             length = FlightParams.Parameters["nose_cone_length"], kind = FlightParams.Parameters["nose_cone_type"], position = FlightParams.Parameters["nose_position"])
@@ -91,7 +77,6 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDat
                 initial_observed_variables=[0, 0, 0],
                 override_rocket_drag= FlightParams.Parameters["override_rocketdrag_with_airbrakedrag"],
                 name = "Air brakes",
-                airbrake_time = setting["time_to_deploy_airbrake_after_burnout"],
             )
 
         Sp25.add_motor(MotorOne, FlightParams.Parameters["the_motor_position"])
@@ -131,13 +116,13 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDat
 
             testFlight = Flight(
                 rocket=Sp25, environment=env,rail_length = FlightParams.Parameters["rail_length"],inclination = setting["inclination"],
-                heading=setting["heading"], terminate_on_apogee = termOnApogee
+                heading=setting["heading"], terminate_on_apogee = FlightParams.Parameters["terminate_at_apogee"]
             )
             print('printing ts crack')
             testFlight.plots.trajectory_3d()
             testFlight.info()
             print("flgith complete1")
-            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env, termOnApogee)
+            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env, FlightParams.Parameters["terminate_at_apogee"])
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])
 

@@ -1,6 +1,2 @@
 
-
-
-
-
-Completed 30 iterations successfully. Total CPU time: 0.0625 s. Total wall time: 11.28221845626831 s
+Completed sim successfully. Total CPU time: 8.078125 s. Total wall time: 8.304575204849243 s

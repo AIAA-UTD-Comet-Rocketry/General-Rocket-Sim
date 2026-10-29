@@ -67,7 +67,7 @@ if(Parameters["atmosphere_type"] == "custom_atmosphere"):
 
 
 
-Parameters["generatedFilesLocation"] = "../Output"
+Parameters["generatedFilesLocation"] = "../Output/"
 
 
 #motor
@@ -140,9 +140,9 @@ Parameters["heading"] = 240
 Parameters["rail_length"] = 7.096
 
 #airbrakes
-Parameters["using-airbrakes"] = False
+Parameters["using-airbrakes"] = True
 if(Parameters["using-airbrakes"]):
-    Parameters["air_brake_drag"] = "InputFiles/air_brake_drag_full.csv"
+    Parameters["air_brake_drag"] = "../InputFiles/AirbrakeDrag.csv"
     Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
     Parameters["airbrake_clamp"] = True
     Parameters["override_rocketdrag_with_airbrakedrag"] = True
@@ -179,7 +179,8 @@ env = Environment(
 #env = Environment(latitude = FlightParams.envParams["latitude"], longitude = FlightParams.envParams["longitude"], elevation = FlightParams.envParams["elevation"])
 
 
-Parameters["doing_monte_carlo"] = True
+Parameters["doing_monte_carlo"] = False
+Parameters["terminate_at_apogee"] = False
 
 print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
@@ -309,7 +310,7 @@ def binarySearch(arr, val, i, j):
         return binarySearch(arr, val, i, midIndex)
 
 # airbrake_deploy_altitude = 2000
-def airbrake_controller_function(time, sampling_rate, state, state_history, observed_variables, air_brakes, env):
+def airbrake_controller_function(time, sampling_rate, state, state_history, observed_variables, air_brakes, sensors, env):
     canDeployAirbrake = False
 
     # deployment_time = air_brakes.airbrake_deploy_time
