@@ -137,7 +137,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDat
             testFlight.plots.trajectory_3d()
             testFlight.info()
             print("flgith complete1")
-            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env)
+            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env, termOnApogee)
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])
 
@@ -173,7 +173,7 @@ def flight_settings(analysis_parameters, total_number):
         # Yield a flight setting
         yield flight_setting
 
-def export_flight_data(flight_setting, flight_data, exec_time, env):
+def export_flight_data(flight_setting, flight_data, exec_time, env, termOnApogee):
     # Generate flight results
     flight_result = {
         "out_of_rail_time": flight_data.out_of_rail_time,
@@ -183,8 +183,6 @@ def export_flight_data(flight_setting, flight_data, exec_time, env):
         "apogee_altitude": flight_data.apogee - env.elevation,
         "apogee_x": flight_data.apogee_x,
         "apogee_y": flight_data.apogee_y,
-        "impact_x": flight_data.x_impact,
-        "impact_y": flight_data.y_impact,
         "initial_static_margin": flight_data.rocket.static_margin(0),
         "out_of_rail_static_margin": flight_data.rocket.static_margin(
             flight_data.out_of_rail_time
@@ -192,6 +190,10 @@ def export_flight_data(flight_setting, flight_data, exec_time, env):
         "out_of_rail_stability_margin": flight_data.out_of_rail_stability_margin,
         "execution_time": exec_time,
     }
+
+    if not termOnApogee:
+        flight_result["impact_x"] = flight_data.x_impact
+        flight_result["impact_y"] = flight_data.y_impact
 
     # Take care of parachute results
     return [flight_setting, flight_result]
