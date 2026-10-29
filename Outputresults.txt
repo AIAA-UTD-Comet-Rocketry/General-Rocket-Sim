@@ -1,5 +1,0 @@
-TOTAL SIMS IS: 1
-
-
-Completed 1 iterations successfully. Total CPU time: 1.3125 s. Total wall time: 1.3359894752502441 s
-Number of simulations: 0

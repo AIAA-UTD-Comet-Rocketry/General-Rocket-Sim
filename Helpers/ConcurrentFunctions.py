@@ -6,7 +6,7 @@ from Helpers import FlightParams
 import logging
 
 # Configure logging
-def RunFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, termOnApogee, launchDate):
+def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time, termOnApogee, launchDate):
     logging.basicConfig(
         filename='app.log',  # Change this to your desired log file
         level=logging.INFO,
@@ -18,7 +18,7 @@ def RunFlightWithMonteCarlo(numOfSims, analysis_parameters, initial_cpu_time, te
     env.set_atmospheric_model(type=FlightParams.Parameters["atmosphere_type"], file=FlightParams.Parameters["env_file"], wind_u=FlightParams.Parameters["wind_u"], wind_v=FlightParams.Parameters["wind_v"], pressure=FlightParams.Parameters["pressure"])
     i=0
     
-    settings = flight_settings(analysis_parameters, numOfSims)
+    settings = flight_settings(FlightParams.Parameters["monte_carlo_parameters"], numOfSims)
 
     for setting in settings:
         start_time = process_time()

@@ -1,3 +1,7 @@
+from scipy.stats import norm
+from matplotlib import pyplot as plt
+
+from rocketpy import Environment
 import json
 import math
 from rocketpy.mathutils.function import Function
@@ -21,8 +25,8 @@ Parameters["hasBottail"] = False
 
 Parameters["obtaining_motor_csv"] = True
 
-Parameters["numberSims"] = 1
-Parameters["processes"] = 1
+Parameters["numberSims"] = 30
+Parameters["processes"] = 5
 Parameters["latitude"] = 31.043722
 Parameters["longitude"] = -103.532806
 
@@ -162,8 +166,19 @@ angleVals = [65, 70, 75, 80, 85, 90]
 
 Parameters["parachutes"] = {}
 
+launchDate = [2025, 6, 12, 8]
+
+# Iterate the loop to read the cell values
+env = Environment(
+    date=launchDate,
+    latitude=Parameters["latitude"],
+    longitude=Parameters["longitude"],
+)
+
+#env = Environment(latitude = FlightParams.envParams["latitude"], longitude = FlightParams.envParams["longitude"], elevation = FlightParams.envParams["elevation"])
 
 
+Parameters["doing_monte_carlo"] = False
 
 print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
@@ -382,3 +397,175 @@ else:
     for i in range(0, len(Parameters["fahrenheit_temp"]), 1):
         newTempArr.append((Parameters["fahrenheit_temp"][i][0], calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"][i][1])))
     Parameters["temperature"] = newTempArr
+
+Parameters["monte_carlo_parameters"] = {
+    # Rocket's dry mass without motor (kg) and its uncertainty (standard deviation)
+    "rocket_mass": (Parameters["spMass"], 0), #.001
+    # # Rocket's inertia moment perpendicular to its axis (kg*m^2)
+    "rocket_inertia_11": (Parameters["spCentralDiameter"], 0),
+    # # Rocket's inertia moment relative to its axis (kg*m^2)
+    "rocket_inertia_33": (Parameters["spCentralAxis"], 0),
+    # Motors's dry mass without propellant (kg) and its uncertainty (standard deviation)
+    "motor_dry_mass": (Parameters["dryMotorMass"], 0), #.001
+    # # Motor's dry inertia moment perpendicular to its axis (kg*m^2)
+    "motor_inertia_11": (Parameters["motor_11_inertia"], 0),
+    # # Motors's dry inertia moment relative to its axis (kg*m^2)
+    "motor_inertia_33": (Parameters["motor_33_inertia"], 0),\
+    # Distance between rocket's center of dry mass and motor's center of dry mass (m)
+    # THIS is likely wrong, go back to check it
+
+    "motor_dry_mass_position": (np.abs(Parameters["the_motor_center_of_dry_mass_position"] - Parameters["rocket_center_of_dry_mass_position"]), 0), #.001
+    # Motor total impulse (N*s)
+    "impulse": (Parameters["impulse"], 0), #25.3
+
+    "motor_position": (Parameters["the_motor_position"], 0),
+
+    # Motor burn out time (s)
+    "burn_time": (Parameters["burn_time"], 0),
+    # Motor's nozzle radius (m)
+    "nozzle_radius": (Parameters["the_nozzle_radius"], 0), #.5 / 1000
+    # Motor's nozzle throat radius (m)
+    "throat_radius": (Parameters["the_throat_radius"], 0), #.5 / 1000
+    # Motor's grain separation (axial distance between two grains) (m)
+    "grain_separation": (Parameters["grainSeparation"], 0),
+    # Motor's grain density (kg/m^3)
+    "grain_density": (Parameters["motor_density"], 0), #20
+    # Motor's grain outer radius (m)
+    "grain_outer_radius": (Parameters["grainOuterRadius"], 0),
+    # Motor's grain inner radius (m)
+    "grain_initial_inner_radius": (Parameters["grainInnerRadius"], 0), #.3 / 1000
+    # Motor's grain height (m)
+    "grain_initial_height": (Parameters["grainHeight"], 0), #1 / 1000
+    # Rocket's radius (kg*m^2)
+    "radius": (Parameters["rocket_radius"], 0),
+    # Nozle position relative to motor
+    "nozzle_position": (Parameters["the_nozzle_position"], 0),
+    # Distance between rocket's center of dry mass and and center of propellant mass (m) (negative)
+    "grains_center_of_mass_position": (Parameters["rocket_center_of_dry_mass_position"]-(Parameters["the_motor_center_of_dry_mass_position"] + Parameters["the_motor_position"]), 0), #.0001
+    # Axial distance between rocket's center of dry mass and nearest point in its nose cone (m)
+    "nose_distance_to_CM": (Parameters["rocket_center_of_dry_mass_position"]-Parameters["nose_cone_length"], 0),
+    # Launch rail inclination angle relative to the horizontal plane (degrees)
+    "inclination": (Parameters["inclination"], 0), #1
+    # Launch rail heading relative to north (degrees)
+    "heading": (Parameters["heading"], 0), #2
+
+    # # Drag coefficient times reference area for the drogue chute (m^2)
+    # "cd_s_drogue": (FlightParams.Parameters["drogueCdS"], 0), #.02
+    # # Drag coefficient times reference area for the light chute
+    # "cd_s_light": (FlightParams.Parameters["lightCdS"], 0), #.02
+    # # Time delay between parachute ejection signal is detected and parachute is inflated (s)
+    # "lag_rec": (FlightParams.Parameters["lag_rec"], 0), #.2
+    # # Time delay between sensor signal is received and ejection signal is fired (s)
+    # "lag_se": (FlightParams.Parameters["lag_se"], 0), #.1
+
+    # temperature in kelvin
+    "temperature": (Parameters["temperature"], 0), #5
+    # atmospheric pessure in pascals
+    "atmosphere_pressure": (env.pressure_ISA(Parameters["elevation"]), 0), #300
+
+    #without motor
+    "rocket_CM": (Parameters["rocket_center_of_dry_mass_position"], 0), #.01
+
+    # adding these, but they don't vary
+    "time_to_deploy_airbrake_after_burnout": (0.1, 0),
+    "fin_position": (2.62, 0)
+}
+
+if(Parameters["doing_monte_carlo"]):
+    pass
+else:
+    for key in Parameters["monte_carlo_parameters"].keys():
+        value = Parameters["monte_carlo_parameters"][key]
+        Parameters["monte_carlo_parameters"][key] = (value[0], 0)
+
+
+def createDistributionPlot(resultsFile, dispersonResultArray, name, lowerProbBound, upperProbBound, maxDecimals, percentConfidence, hypothesis, unit, makeGraph, filename):
+    mean = np.mean(dispersonResultArray)
+    deviation = np.std(dispersonResultArray)
+    unitString = ""
+    if(unit == "meters"):
+        unitString = "m"
+    print(
+        f'{name} -         Mean Value: {mean:0.3f} ' + unitString
+    )
+    resultsFile.write(f'{name} -         Mean Value: {mean:0.3f} ' + unitString + "\n")
+    print(
+        f'{name} - Standard Deviation: {deviation:0.3f} m' + unitString
+    )
+    resultsFile.write(f'{name} - Standard Deviation: {deviation:0.3f} m' + unitString + "\n")
+    if(makeGraph):
+
+        print(f"Arr: {dispersonResultArray}")
+        minimum = np.min(dispersonResultArray)
+        maximum = np.max(dispersonResultArray)
+        theBins = list()
+
+        #using scott's rule to find the number of bins
+        binWidth = 3.5 * deviation / np.power(len(dispersonResultArray), 1/3)
+        numBins = int(np.round((maximum-minimum)/binWidth))
+
+        changeInZ = (maximum - minimum) / numBins
+        #test add
+        zIterator = minimum
+        for iterator in range(numBins):
+            theBins.append(zIterator)
+            zIterator += changeInZ
+        finalValue = np.ceil(zIterator * np.power(10, maxDecimals)) / np.power(10, maxDecimals)
+        theBins.append(finalValue)
+        plt.figure()
+        plt.xlim(minimum, maximum)
+        minTextSize = 8
+        maxTickCount = 50
+        xTickBins = theBins
+        if(numBins > maxTickCount):
+            xTickBins = list()
+            changeInZ = (maximum - minimum) / 50.0
+            zIterator = minimum
+            for iterator in range(50):
+                xTickBins.append(zIterator)
+                zIterator += changeInZ
+        binListToString = list()
+        for currentBin in xTickBins:
+            binListToString.append(str(round(currentBin, maxDecimals)))
+        plt.xticks(ticks = xTickBins, labels = binListToString, rotation = 75, fontsize = minTextSize)
+        plt.hist(dispersonResultArray, bins=theBins)
+        plt.title(name)
+        plt.xlabel(name)
+        plt.ylabel("Number of Occurences")
+
+        plt.axvline(mean, color='k', linestyle='solid', linewidth=4)
+        plt.axvline(mean - deviation, color='g', linestyle='solid', linewidth=3)
+        plt.axvline(mean - 2*deviation, color='g', linestyle='solid', linewidth=3)
+        plt.axvline(mean - 3*deviation, color='g', linestyle='solid', linewidth=3)
+        plt.axvline(mean + deviation, color='g', linestyle='solid', linewidth=3)
+        plt.axvline(mean + 2*deviation, color='g', linestyle='solid', linewidth=3)
+        plt.axvline(mean + 3*deviation, color='g', linestyle='solid', linewidth=3)
+        plt.savefig(Parameters["generatedFilesLocation"] + str(filename) + "Graph.png", bbox_inches="tight", pad_inches=0)
+        plt.show()
+    lowerZ = (lowerProbBound - mean)/deviation
+    upperZ = (upperProbBound - mean)/deviation
+    probabilityInRange = norm.cdf(upperZ) - norm.cdf(lowerZ)
+    print("PROBABILITY THE " + name +  " IS IN BETWEEN " + str(round(lowerProbBound, 4)) + " AND " + str(round(upperProbBound, 4)) + " IS: " + str(round(probabilityInRange * 100, 2)) + "%")
+    resultsFile.write("PROBABILITY THE " + name +  " IS IN BETWEEN " + str(round(lowerProbBound, 4)) + " AND " + str(round(upperProbBound, 4)) + " IS: " + str(round(probabilityInRange * 100, 2)) + "%\n")
+    if(percentConfidence != 100):
+        aVal = (100 - percentConfidence)/100
+        newZ = np.abs(norm.ppf(aVal/2))
+        lowerBoundOfInterval = mean - newZ * deviation/np.sqrt(len(dispersonResultArray))
+        upperBoundOfInterval = mean + newZ * deviation/np.sqrt(len(dispersonResultArray))
+        print("There is a " + str(percentConfidence) + f"% chance that the mean of the " + name + 
+              " falls within THIS RANGE: " + str(lowerBoundOfInterval) + ", " + str(upperBoundOfInterval))
+        resultsFile.write("There is a " + str(percentConfidence) + f"% chance that the mean of the " + name + 
+              " falls within THIS RANGE: " + str(lowerBoundOfInterval) + ", " + str(upperBoundOfInterval) + "\n")
+        if(hypothesis != None):
+            criticalValue = norm.ppf(aVal / 2)
+            testStatistic = (mean - hypothesis) * np.sqrt(len(dispersonResultArray))/deviation
+            print("\nWe have the hypothesis that our mean is greater than or equal to " + str(hypothesis) + ". With our critical percent, our critical value is " +
+                str(criticalValue) + ". Then, our test statistic is " + str(testStatistic))
+            resultsFile.write("\nWe have the hypothesis that our mean is greater than or equal to " + str(hypothesis) + ". With our critical percent, our critical value is " +
+                str(criticalValue) + ". Then, our test statistic is " + str(testStatistic) + "\n")
+            if(testStatistic < criticalValue):
+                print("Since our test statistic is more extreme than our critical value, we can reject the null hypothesis that the mean is " + str(hypothesis) + ".\n")
+                resultsFile.write("Since our test statistic is more extreme than our critical value, we can reject the null hypothesis that the mean is " + str(hypothesis) + ".\n\n")
+            else:
+                print("Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is " + str(hypothesis) + ".\n")
+                resultsFile.write("Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is " + str(hypothesis) + ".\n\n")
