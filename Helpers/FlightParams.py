@@ -26,8 +26,8 @@ Parameters["hasBottail"] = False
 
 Parameters["obtaining_motor_csv"] = True
 
-Parameters["numberSims"] = 30
-Parameters["processes"] = 5
+Parameters["numberSims"] = 200
+Parameters["processes"] = 10
 Parameters["latitude"] = 31.043722
 Parameters["longitude"] = -103.532806
 
@@ -446,9 +446,9 @@ Parameters["monte_carlo_parameters"] = {
     # Axial distance between rocket's center of dry mass and nearest point in its nose cone (m)
     "nose_distance_to_CM": (Parameters["rocket_center_of_dry_mass_position"]-Parameters["nose_cone_length"], 0),
     # Launch rail inclination angle relative to the horizontal plane (degrees)
-    "inclination": (Parameters["inclination"], 0), #1
+    "inclination": (Parameters["inclination"], 15), #1
     # Launch rail heading relative to north (degrees)
-    "heading": (Parameters["heading"], 0), #2
+    "heading": (Parameters["heading"], 15), #2
 
     # # Drag coefficient times reference area for the drogue chute (m^2)
     # "cd_s_drogue": (FlightParams.Parameters["drogueCdS"], 0), #.02
