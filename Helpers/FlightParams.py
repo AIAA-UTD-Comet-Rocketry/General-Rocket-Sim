@@ -1,3 +1,4 @@
+import logging
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 
@@ -178,7 +179,7 @@ env = Environment(
 #env = Environment(latitude = FlightParams.envParams["latitude"], longitude = FlightParams.envParams["longitude"], elevation = FlightParams.envParams["elevation"])
 
 
-Parameters["doing_monte_carlo"] = False
+Parameters["doing_monte_carlo"] = True
 
 print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
 
@@ -400,11 +401,11 @@ else:
 
 Parameters["monte_carlo_parameters"] = {
     # Rocket's dry mass without motor (kg) and its uncertainty (standard deviation)
-    "rocket_mass": (Parameters["spMass"], 0), #.001
+    "rocket_mass": (Parameters["spMass"], 4), #.001
     # # Rocket's inertia moment perpendicular to its axis (kg*m^2)
-    "rocket_inertia_11": (Parameters["spCentralDiameter"], 0),
+    "rocket_inertia_11": (Parameters["spCentralDiameter"], 0.5),
     # # Rocket's inertia moment relative to its axis (kg*m^2)
-    "rocket_inertia_33": (Parameters["spCentralAxis"], 0),
+    "rocket_inertia_33": (Parameters["spCentralAxis"], 0.5),
     # Motors's dry mass without propellant (kg) and its uncertainty (standard deviation)
     "motor_dry_mass": (Parameters["dryMotorMass"], 0), #.001
     # # Motor's dry inertia moment perpendicular to its axis (kg*m^2)
@@ -416,12 +417,12 @@ Parameters["monte_carlo_parameters"] = {
 
     "motor_dry_mass_position": (np.abs(Parameters["the_motor_center_of_dry_mass_position"] - Parameters["rocket_center_of_dry_mass_position"]), 0), #.001
     # Motor total impulse (N*s)
-    "impulse": (Parameters["impulse"], 0), #25.3
+    "impulse": (Parameters["impulse"], 100), #25.3
 
     "motor_position": (Parameters["the_motor_position"], 0),
 
     # Motor burn out time (s)
-    "burn_time": (Parameters["burn_time"], 0),
+    "burn_time": (Parameters["burn_time"], 1),
     # Motor's nozzle radius (m)
     "nozzle_radius": (Parameters["the_nozzle_radius"], 0), #.5 / 1000
     # Motor's nozzle throat radius (m)
@@ -569,3 +570,18 @@ def createDistributionPlot(resultsFile, dispersonResultArray, name, lowerProbBou
             else:
                 print("Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is " + str(hypothesis) + ".\n")
                 resultsFile.write("Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is " + str(hypothesis) + ".\n\n")
+
+#sets up the ability to log inputs.
+def setup_logging():
+    class MyHandler(logging.FileHandler):
+        def emit(self, record):
+            super().emit(record)  # Call the superclass's emit method
+            self.flush()  # Flush after each log message
+
+    # Use your custom handler
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    handler = MyHandler('app.log', 'a')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
