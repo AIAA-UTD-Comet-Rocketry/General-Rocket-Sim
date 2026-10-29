@@ -45,13 +45,13 @@ Parameters["true_names"] = []
 Parameters["true_ranges"] = []
 Parameters["true_current_indices"] = []
 
-for i in range(Parameters["iterative_variables"]):
+for i in range(len(Parameters["iterative_variables"])):
     try:
         trueIndex = varyingPossibilitiesName.index(Parameters["iterative_variables"][i])
         Parameters["true_names"].append(varyingPossibilitiesName[trueIndex])
         Parameters["true_ranges"].append(varyingRanges[trueIndex])
         Parameters["true_current_indices"].append(0)
-    except ValueError():
+    except ValueError:
         print("element not found! abort immedietly!")
         raise SystemExit
 
@@ -618,6 +618,11 @@ def setup_logging():
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
+# note: returns whether or not we're fully done
 def NextIteration():
-    for i in (len(Parameters["true_names"]), -1, -1):
-        if()
+    for i in range(len(Parameters["true_names"]) - 1, -1, -1):
+        if(Parameters["true_current_indices"][i] < len(Parameters["true_ranges"][i]) - 1):
+            Parameters["true_current_indices"][i] += 1
+            return False
+    return True
+    
