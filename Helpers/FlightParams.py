@@ -41,6 +41,7 @@ for i in range(len(varyingRanges)):
 
 Parameters["iterative_variables"] = ["Day", "Hour"]
 
+Parameters["readable_names"] = []
 Parameters["true_names"] = []
 Parameters["true_ranges"] = []
 Parameters["true_current_indices"] = []
@@ -48,12 +49,21 @@ Parameters["true_current_indices"] = []
 for i in range(len(Parameters["iterative_variables"])):
     try:
         trueIndex = varyingPossibilitiesName.index(Parameters["iterative_variables"][i])
-        Parameters["true_names"].append(varyingPossibilitiesName[trueIndex])
+        Parameters["readable_names"].append(varyingPossibilitiesName[trueIndex])
+        Parameters["true_names"].append(varyingPossibilitiesKeyMapping[trueIndex])
         Parameters["true_ranges"].append(varyingRanges[trueIndex])
         Parameters["true_current_indices"].append(0)
     except ValueError:
         print("element not found! abort immedietly!")
         raise SystemExit
+
+def UpdateIterativeVariables():
+    for i in range(len(Parameters["true_names"])):
+        trueParamString = Parameters["true_names"][i]
+        trueIndexInRange = Parameters["true_current_indices"][i]
+        trueNextVal = Parameters["true_ranges"][trueIndexInRange]
+
+        Parameters[trueParamString] = trueNextVal
 
 Parameters["hasBottail"] = False
 
@@ -619,10 +629,17 @@ def setup_logging():
     logger.addHandler(handler)
 
 # note: returns whether or not we're fully done
-def NextIteration():
+def UpdateIndices():
     for i in range(len(Parameters["true_names"]) - 1, -1, -1):
         if(Parameters["true_current_indices"][i] < len(Parameters["true_ranges"][i]) - 1):
             Parameters["true_current_indices"][i] += 1
             return False
     return True
-    
+
+def NextIteration():
+    everythingFinished = UpdateIndices()
+    if everythingFinished:
+        return True
+
+    UpdateIterativeVariables()
+    return False
