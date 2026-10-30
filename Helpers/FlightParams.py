@@ -41,7 +41,7 @@ for i in range(len(varyingRanges)):
             trueDate = Parameters["start_day"] + timedelta(days = j)
             varyingRanges[i][j] = [trueDate.year, trueDate.month, trueDate.day]
 
-Parameters["iterative_variables"] = ["Day", "Hour"]
+Parameters["iterative_variables"] = []
 
 if(not Parameters["doing_monte_carlo"]):
     Parameters["iterative_variables"] = []
