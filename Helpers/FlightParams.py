@@ -17,8 +17,11 @@ from Helpers.GetWeatherData import GetWeatherData
 
 Parameters = {}
 
-Parameters["day"] = date.today()
+Parameters["start_day"] = date.today()
+
+Parameters["day"] = [Parameters["start_day"].year, Parameters["start_day"].month, Parameters["start_day"].day]
 Parameters["hour"] = 14
+Parameters["doing_monte_carlo"] = True
 
 #Non Rocket Parameters
 varyingPossibilitiesName = ["Fin Position", "Day", "Hour"]
@@ -35,11 +38,13 @@ for i in range(len(varyingRanges)):
     varyingRanges[i] = np.linspace(*varyingRanges[i]).tolist()
     if varyingPossibilitiesKeyMapping[i] == "day":
         for j in range(len(varyingRanges[i])):
-            trueDate = Parameters["day"] + timedelta(days = varyingRanges[i][j])
+            trueDate = Parameters["start_day"] + timedelta(days = j)
             varyingRanges[i][j] = [trueDate.year, trueDate.month, trueDate.day]
 
-
 Parameters["iterative_variables"] = ["Day", "Hour"]
+
+if(not Parameters["doing_monte_carlo"]):
+    Parameters["iterative_variables"] = []
 
 Parameters["readable_names"] = []
 Parameters["true_names"] = []
@@ -62,18 +67,21 @@ def UpdateIterativeVariables():
     for i in range(len(Parameters["true_names"])):
         trueParamString = Parameters["true_names"][i]
         trueIndexInRange = Parameters["true_current_indices"][i]
-        trueNextVal = Parameters["true_ranges"][trueIndexInRange]
+        trueNextVal = Parameters["true_ranges"][i][trueIndexInRange]
+
 
         Parameters[trueParamString] = trueNextVal
 
+
 UpdateIterativeVariables()
+
 
 Parameters["hasBottail"] = False
 
 Parameters["obtaining_motor_csv"] = True
 
-Parameters["numberSims"] = 200
-Parameters["processes"] = 10
+Parameters["numberSims"] = 5
+Parameters["processes"] = 5
 Parameters["latitude"] = 31.043722
 Parameters["longitude"] = -103.532806
 
@@ -223,7 +231,6 @@ env = Environment(
 #env = Environment(latitude = FlightParams.envParams["latitude"], longitude = FlightParams.envParams["longitude"], elevation = FlightParams.envParams["elevation"])
 
 
-Parameters["doing_monte_carlo"] = True
 Parameters["terminate_at_apogee"] = False
 
 print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
@@ -637,6 +644,9 @@ def UpdateIndices():
         if(Parameters["true_current_indices"][i] < len(Parameters["true_ranges"][i]) - 1):
             Parameters["true_current_indices"][i] += 1
             return False
+        else:
+            Parameters["true_current_indices"][i] = 0
+
     return True
 
 def NextIteration():
