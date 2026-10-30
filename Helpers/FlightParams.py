@@ -65,6 +65,8 @@ def UpdateIterativeVariables():
 
         Parameters[trueParamString] = trueNextVal
 
+UpdateIterativeVariables()
+
 Parameters["hasBottail"] = False
 
 Parameters["obtaining_motor_csv"] = True
