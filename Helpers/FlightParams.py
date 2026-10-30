@@ -32,7 +32,7 @@ varyingRanges = [
 ]
 
 for i in range(len(varyingRanges)):
-    varyingRanges[i] = np.linspace(*varyingRanges[i])
+    varyingRanges[i] = np.linspace(*varyingRanges[i]).tolist()
     if varyingPossibilitiesKeyMapping[i] == "day":
         for j in range(len(varyingRanges[i])):
             trueDate = Parameters["day"] + timedelta(days = varyingRanges[i][j])
@@ -48,7 +48,8 @@ Parameters["true_current_indices"] = []
 
 for i in range(len(Parameters["iterative_variables"])):
     try:
-        trueIndex = varyingPossibilitiesName.index(Parameters["iterative_variables"][i])
+        currentStr = Parameters["iterative_variables"][i]
+        trueIndex = varyingPossibilitiesName.index(currentStr)
         Parameters["readable_names"].append(varyingPossibilitiesName[trueIndex])
         Parameters["true_names"].append(varyingPossibilitiesKeyMapping[trueIndex])
         Parameters["true_ranges"].append(varyingRanges[trueIndex])
@@ -222,7 +223,7 @@ env = Environment(
 #env = Environment(latitude = FlightParams.envParams["latitude"], longitude = FlightParams.envParams["longitude"], elevation = FlightParams.envParams["elevation"])
 
 
-Parameters["doing_monte_carlo"] = False
+Parameters["doing_monte_carlo"] = True
 Parameters["terminate_at_apogee"] = False
 
 print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
