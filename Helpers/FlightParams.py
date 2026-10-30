@@ -30,8 +30,8 @@ varyingPossibilitiesKeyMapping = ["fin_position", "day", "hour"]
 # put the start end range (inclusive), then the # of elements you want in between them
 varyingRanges = [
     [2.67, 2.92, 11],
-    [0, 7, 8],
-    [5, 15, 11]
+    [0, 1, 2],
+    [5, 6, 2]
 ]
 
 for i in range(len(varyingRanges)):
@@ -41,7 +41,7 @@ for i in range(len(varyingRanges)):
             trueDate = Parameters["start_day"] + timedelta(days = j)
             varyingRanges[i][j] = [trueDate.year, trueDate.month, trueDate.day]
 
-Parameters["iterative_variables"] = []
+Parameters["iterative_variables"] = ["Day", "Hour"]
 
 if(not Parameters["doing_monte_carlo"]):
     Parameters["iterative_variables"] = []
