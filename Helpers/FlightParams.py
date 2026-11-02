@@ -1,16 +1,12 @@
 from datetime import date, timedelta
 import logging
-from scipy.stats import norm
-from matplotlib import pyplot as plt
 
 from rocketpy import Environment
 import json
-import math
 from rocketpy.mathutils.function import Function
 from rocketpy.motors import motor
 import numpy as np
 import pandas as pd
-import requests
 from Helpers.GetWeatherData import GetWeatherData
 
 # HERE ARE THE VARIABLES YOU WILL HAVE TO CHANGE
@@ -531,97 +527,6 @@ else:
         value = Parameters["monte_carlo_parameters"][key]
         Parameters["monte_carlo_parameters"][key] = (value[0], 0)
 
-
-def createDistributionPlot(resultsFile, dispersonResultArray, name, lowerProbBound, upperProbBound, maxDecimals, percentConfidence, hypothesis, unit, makeGraph, filename):
-    mean = np.mean(dispersonResultArray)
-    deviation = np.std(dispersonResultArray)
-    unitString = ""
-    if(unit == "meters"):
-        unitString = "m"
-    print(
-        f'{name} -         Mean Value: {mean:0.3f} ' + unitString
-    )
-    resultsFile.write(f'{name} -         Mean Value: {mean:0.3f} ' + unitString + "\n")
-    print(
-        f'{name} - Standard Deviation: {deviation:0.3f} m' + unitString
-    )
-    resultsFile.write(f'{name} - Standard Deviation: {deviation:0.3f} m' + unitString + "\n")
-    if(makeGraph):
-
-        print(f"Arr: {dispersonResultArray}")
-        minimum = np.min(dispersonResultArray)
-        maximum = np.max(dispersonResultArray)
-        theBins = list()
-
-        #using scott's rule to find the number of bins
-        binWidth = 3.5 * deviation / np.power(len(dispersonResultArray), 1/3)
-        numBins = int(np.round((maximum-minimum)/binWidth))
-
-        changeInZ = (maximum - minimum) / numBins
-        #test add
-        zIterator = minimum
-        for iterator in range(numBins):
-            theBins.append(zIterator)
-            zIterator += changeInZ
-        finalValue = np.ceil(zIterator * np.power(10, maxDecimals)) / np.power(10, maxDecimals)
-        theBins.append(finalValue)
-        plt.figure()
-        plt.xlim(minimum, maximum)
-        minTextSize = 8
-        maxTickCount = 50
-        xTickBins = theBins
-        if(numBins > maxTickCount):
-            xTickBins = list()
-            changeInZ = (maximum - minimum) / 50.0
-            zIterator = minimum
-            for iterator in range(50):
-                xTickBins.append(zIterator)
-                zIterator += changeInZ
-        binListToString = list()
-        for currentBin in xTickBins:
-            binListToString.append(str(round(currentBin, maxDecimals)))
-        plt.xticks(ticks = xTickBins, labels = binListToString, rotation = 75, fontsize = minTextSize)
-        plt.hist(dispersonResultArray, bins=theBins)
-        plt.title(name)
-        plt.xlabel(name)
-        plt.ylabel("Number of Occurences")
-
-        plt.axvline(mean, color='k', linestyle='solid', linewidth=4)
-        plt.axvline(mean - deviation, color='g', linestyle='solid', linewidth=3)
-        plt.axvline(mean - 2*deviation, color='g', linestyle='solid', linewidth=3)
-        plt.axvline(mean - 3*deviation, color='g', linestyle='solid', linewidth=3)
-        plt.axvline(mean + deviation, color='g', linestyle='solid', linewidth=3)
-        plt.axvline(mean + 2*deviation, color='g', linestyle='solid', linewidth=3)
-        plt.axvline(mean + 3*deviation, color='g', linestyle='solid', linewidth=3)
-        plt.savefig(Parameters["generatedFilesLocation"] + str(filename) + "Graph.png", bbox_inches="tight", pad_inches=0)
-        plt.show()
-    lowerZ = (lowerProbBound - mean)/deviation
-    upperZ = (upperProbBound - mean)/deviation
-    probabilityInRange = norm.cdf(upperZ) - norm.cdf(lowerZ)
-    print("PROBABILITY THE " + name +  " IS IN BETWEEN " + str(round(lowerProbBound, 4)) + " AND " + str(round(upperProbBound, 4)) + " IS: " + str(round(probabilityInRange * 100, 2)) + "%")
-    resultsFile.write("PROBABILITY THE " + name +  " IS IN BETWEEN " + str(round(lowerProbBound, 4)) + " AND " + str(round(upperProbBound, 4)) + " IS: " + str(round(probabilityInRange * 100, 2)) + "%\n")
-    if(percentConfidence != 100):
-        aVal = (100 - percentConfidence)/100
-        newZ = np.abs(norm.ppf(aVal/2))
-        lowerBoundOfInterval = mean - newZ * deviation/np.sqrt(len(dispersonResultArray))
-        upperBoundOfInterval = mean + newZ * deviation/np.sqrt(len(dispersonResultArray))
-        print("There is a " + str(percentConfidence) + f"% chance that the mean of the " + name + 
-              " falls within THIS RANGE: " + str(lowerBoundOfInterval) + ", " + str(upperBoundOfInterval))
-        resultsFile.write("There is a " + str(percentConfidence) + f"% chance that the mean of the " + name + 
-              " falls within THIS RANGE: " + str(lowerBoundOfInterval) + ", " + str(upperBoundOfInterval) + "\n")
-        if(hypothesis != None):
-            criticalValue = norm.ppf(aVal / 2)
-            testStatistic = (mean - hypothesis) * np.sqrt(len(dispersonResultArray))/deviation
-            print("\nWe have the hypothesis that our mean is greater than or equal to " + str(hypothesis) + ". With our critical percent, our critical value is " +
-                str(criticalValue) + ". Then, our test statistic is " + str(testStatistic))
-            resultsFile.write("\nWe have the hypothesis that our mean is greater than or equal to " + str(hypothesis) + ". With our critical percent, our critical value is " +
-                str(criticalValue) + ". Then, our test statistic is " + str(testStatistic) + "\n")
-            if(testStatistic < criticalValue):
-                print("Since our test statistic is more extreme than our critical value, we can reject the null hypothesis that the mean is " + str(hypothesis) + ".\n")
-                resultsFile.write("Since our test statistic is more extreme than our critical value, we can reject the null hypothesis that the mean is " + str(hypothesis) + ".\n\n")
-            else:
-                print("Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is " + str(hypothesis) + ".\n")
-                resultsFile.write("Since our test statistic is less extreme than our critical value, we can NOT reject the null hypothesis that the mean is " + str(hypothesis) + ".\n\n")
 
 #sets up the ability to log inputs.
 def setup_logging():

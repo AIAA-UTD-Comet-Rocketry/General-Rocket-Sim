@@ -3,4 +3,4 @@
 
 
 
-Completed 5 iterations successfully. Total CPU time: 0.0625 s. Total wall time: 15.10184097290039 s
+Completed 5 iterations successfully. Total CPU time: 0.015625 s. Total wall time: 13.518392086029053 s
