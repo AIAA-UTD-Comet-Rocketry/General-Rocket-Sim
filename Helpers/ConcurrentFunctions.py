@@ -72,7 +72,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             Sp25.add_air_brakes(
                 drag_coefficient_curve= FlightParams.Parameters["air_brake_drag"],
                 # drag_coefficient_curve= 1,
-                controller_function= FlightParams.Parameters["airbrake_controller_function"],
+                controller_function= FlightParams.Parameters["airbrake_policy"].airbrake_controller_function,
                 sampling_rate= FlightParams.Parameters["airbrake_sample_rate"],
                 reference_area = FlightParams.Parameters["airbrake_area"],
                 clamp = FlightParams.Parameters["airbrake_clamp"],

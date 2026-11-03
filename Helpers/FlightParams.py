@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 import logging
 
+from Helpers import LookupTable
 from rocketpy import Environment
 import json
 from rocketpy.mathutils.function import Function
@@ -195,23 +196,10 @@ if(Parameters["using-airbrakes"]):
     Parameters["airbrake_clamp"] = True
     Parameters["override_rocketdrag_with_airbrakedrag"] = True
     Parameters["airbrake_area"] = 2 # in meters
+    Parameters["airbrake_policy"] = LookupTable(Parameters["burn_time"])
 
 # Parameters["halfway_to_target"] = 1524
 
-lookupTable = "../InputFiles/FinalLookupTable.csv"
-
-# vel range is 0, 275
-
-# alt range is X, 3048
-
-minAlt = 2500
-maxAlt = 3048
-
-minVel = 0
-maxVel = 275
-
-# angleVals = [90, 85, 80, 75, 70, 65]
-angleVals = [65, 70, 75, 80, 85, 90]
 
 Parameters["parachutes"] = {}
 
@@ -289,150 +277,7 @@ Parameters["power_off"] = 1
 Parameters["power_on"] = 1
 Parameters["nose_position"] = 0
 
-def getPitch(q):
-    def quat_conjugate(q):
-        w, x, y, z = q
-        return np.array([w, -x, -y, -z])
 
-    def quat_mul(a, b):
-        aw, ax, ay, az = a
-        bw, bx, by, bz = b
-        return np.array([
-            aw*bw - ax*bx - ay*by - az*bz,
-            aw*bx + ax*bw + ay*bz - az*by,
-            aw*by - ax*bz + ay*bw + az*bx,
-            aw*bz + ax*by - ay*bx + az*bw
-        ])
-
-    def rotate_vector_by_quat(v, q):
-        qv = np.array([0.0, v[0], v[1], v[2]])
-        qc = quat_conjugate(q)
-        return quat_mul(quat_mul(q, qv), qc)[1:]  # vector part
-
-    # World up vector
-    up = np.array([0.0, 0.0, 1.0])
-    obj_up = rotate_vector_by_quat(up, q)
-
-    # Angle from flat plane (XY plane)
-    theta = np.arccos(np.clip(obj_up[2], -1.0, 1.0))  # radians
-    pitch = np.degrees(theta)
-    return 90 - pitch
-
-# note: when getting our csv, check it against min and max values. 
-# altitude is column, velocity row
-
-table = pd.read_csv(lookupTable, header=None)
-
-numVelPoints = int(table.shape[0] / len(angleVals))
-numAltPoints = table.shape[1]
-
-velIncrementAmount = (maxVel - minVel) / (numVelPoints - 1)
-altIncrementAmount = (maxAlt - minAlt) / (numAltPoints - 1)
-
-velocityVals = np.linspace(minVel, maxVel, numVelPoints)
-altitudeVals = np.linspace(minAlt, maxAlt, numAltPoints)
-# altitudeVals = np.arange(minAlt, maxAlt + 1, altIncrementAmount)
-
-numAngles = len(angleVals)
-
-def closerIndex(arr, val, smallerIndex, largerIndex):
-    distI = val - arr[smallerIndex]
-    distJ = arr[largerIndex] - val
-    return (smallerIndex if distI < distJ else largerIndex)
-
-# binary searches to find ideal index
-def binarySearch(arr, val, i, j):
-    # if down to last two elements, take closest one instead
-    if(i + 1 == j):
-        return closerIndex(arr, val, i, j)
-
-    midIndex = (j + i) // 2
-
-    # typical binary search activities
-    if(arr[midIndex] == val):
-        return midIndex
-    elif(val > arr[midIndex]):
-        return binarySearch(arr, val, midIndex, j)
-    else:
-        return binarySearch(arr, val, i, midIndex)
-
-# airbrake_deploy_altitude = 2000
-def airbrake_controller_function(time, sampling_rate, state, state_history, observed_variables, air_brakes, sensors, env):
-    canDeployAirbrake = False
-
-    # deployment_time = air_brakes.airbrake_deploy_time
-
-    # state = [x, y, z, vx, vy, vz, e0, e1, e2, e3, wx, wy, wz]
-    altitude_ASL = state[2]
-    above_ground_altitude = altitude_ASL - env.elevation
-    vx, vy, vz = state[3], state[4], state[5]
-    e0, e1, e2, e3 = state[6], state[7], state[8], state[9]
-
-    print(f"E0: {e0}, E1: {e1}, E2: {e2}, E3: {e3}")
-
-
-    # Get winds in x and y directions
-    wind_x, wind_y = env.wind_velocity_x(altitude_ASL), env.wind_velocity_y(altitude_ASL)
-
-    y_velocity = abs(vy - wind_y)
-
-    # Calculate Mach number, by first getting entire speed
-    free_stream_speed = (
-        (wind_x - vx) ** 2 + (wind_y - vy) ** 2 + (vz) ** 2
-    ) ** 0.5
-    mach_number = free_stream_speed / env.speed_of_sound(altitude_ASL)
-
-    # Get previous state from state_history
-    previous_state = state_history[-1]
-    previous_vz = previous_state[5]
-
-    # If we wanted to we could get the returned values from observed_variables:
-    # returned_time, deployment_level, drag_coefficient = observed_variables[-1]
-
-    # Example quaternion in (w, x, y, z)
-    pitch = getPitch(np.array([e0, e1, e2, e3]))  # ~15° rotation around Y
-
-    print("Angle from flat plane (deg):", pitch)
-
-    # ALTITUDES IS COLUMN, VELCOITIES IS ROWS
-
-
-    # gets closest index to this angle
-    angleIndex = binarySearch(angleVals, pitch, 0, numAngles - 1)
-    velocityIndex = binarySearch(velocityVals, vz, 0, numVelPoints - 1)
-    altitudeIndex = binarySearch(altitudeVals, above_ground_altitude, 0, numAltPoints - 1)
-
-    altitudeIndex = len(altitudeVals) - altitudeIndex - 1
-    angleIndex = len(angleVals) - angleIndex - 1
-
-    print(f"The goddamn altitude: {above_ground_altitude}")
-    print(f"The altitude index is: {altitudeIndex}, while the number of altitudes is {len(altitudeVals)}")
-    print(f"The velocity index is: {velocityIndex}, while the number of altitudes is {len(velocityVals)}")
-    # print(altitudeVals)
-
-    # print(f"row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}")
-
-    # should be good
-    deploymentLevel = table.iloc[angleIndex * numVelPoints + velocityIndex][altitudeIndex] / 127.0
-
-
-    print(f"Our aaltitude was {above_ground_altitude}, our velocity Y was {vz}, our angle was {pitch}")
-
-
-
-    # Check if the rocket has reached burnout
-    if (vz > 0 and time > Parameters["burn_time"]):
-        air_brakes.deployment_level = deploymentLevel
-        canDeployAirbrake = True
-        print(f"WE CAN DEPLOY! Deployment level is {air_brakes.deployment_level}. Also, time is {time}, row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
-              angle value is {angleIndex} and velocity index is {velocityIndex}")
-            
-    return (
-        "airbrake" + str(canDeployAirbrake),
-        time,
-        air_brakes.deployment_level,
-        air_brakes.drag_coefficient(air_brakes.deployment_level, mach_number),
-    )
 
 def calcKelvinfromFahrenheit(fTemp):
     return (fTemp - 32) * 5/9 + 273.15
