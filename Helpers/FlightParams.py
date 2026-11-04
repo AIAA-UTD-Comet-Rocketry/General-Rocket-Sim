@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 import logging
 
+from Helpers.IterationManager import IterationManager
 from Helpers.LookupTable import LookupTable
 from rocketpy import Environment
 import json
@@ -18,59 +19,7 @@ Parameters["start_day"] = date.today()
 
 Parameters["day"] = [Parameters["start_day"].year, Parameters["start_day"].month, Parameters["start_day"].day]
 Parameters["hour"] = 14
-Parameters["doing_monte_carlo"] = False
-
-#Non Rocket Parameters
-varyingPossibilitiesName = ["Fin Position", "Day", "Hour"]
-varyingPossibilitiesKeyMapping = ["fin_position", "day", "hour"]
-
-# put the start end range (inclusive), then the # of elements you want in between them
-varyingRanges = [
-    [2.67, 2.92, 11],
-    [0, 1, 2],
-    [5, 6, 2]
-]
-
-for i in range(len(varyingRanges)):
-    varyingRanges[i] = np.linspace(*varyingRanges[i]).tolist()
-    if varyingPossibilitiesKeyMapping[i] == "day":
-        for j in range(len(varyingRanges[i])):
-            trueDate = Parameters["start_day"] + timedelta(days = j)
-            varyingRanges[i][j] = [trueDate.year, trueDate.month, trueDate.day]
-
-Parameters["iterative_variables"] = ["Day", "Hour"]
-
-if(not Parameters["doing_monte_carlo"]):
-    Parameters["iterative_variables"] = []
-
-Parameters["readable_names"] = []
-Parameters["true_names"] = []
-Parameters["true_ranges"] = []
-Parameters["true_current_indices"] = []
-
-for i in range(len(Parameters["iterative_variables"])):
-    try:
-        currentStr = Parameters["iterative_variables"][i]
-        trueIndex = varyingPossibilitiesName.index(currentStr)
-        Parameters["readable_names"].append(varyingPossibilitiesName[trueIndex])
-        Parameters["true_names"].append(varyingPossibilitiesKeyMapping[trueIndex])
-        Parameters["true_ranges"].append(varyingRanges[trueIndex])
-        Parameters["true_current_indices"].append(0)
-    except ValueError:
-        print("element not found! abort immedietly!")
-        raise SystemExit
-
-def UpdateIterativeVariables():
-    for i in range(len(Parameters["true_names"])):
-        trueParamString = Parameters["true_names"][i]
-        trueIndexInRange = Parameters["true_current_indices"][i]
-        trueNextVal = Parameters["true_ranges"][i][trueIndexInRange]
-
-
-        Parameters[trueParamString] = trueNextVal
-
-
-UpdateIterativeVariables()
+Parameters["doing_monte_carlo"] = True
 
 
 Parameters["hasBottail"] = False
@@ -190,6 +139,7 @@ Parameters["rail_length"] = 7.096
 
 #airbrakes
 Parameters["using-airbrakes"] = False
+
 if(Parameters["using-airbrakes"]):
     Parameters["air_brake_drag"] = "../InputFiles/AirbrakeDrag.csv"
     Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
@@ -342,13 +292,13 @@ Parameters["monte_carlo_parameters"] = {
     "heading": (Parameters["heading"], 15), #2
 
     # # Drag coefficient times reference area for the drogue chute (m^2)
-    # "cd_s_drogue": (FlightParams.Parameters["drogueCdS"], 0), #.02
+    # "cd_s_drogue": (Parameters["drogueCdS"], 0), #.02
     # # Drag coefficient times reference area for the light chute
-    # "cd_s_light": (FlightParams.Parameters["lightCdS"], 0), #.02
+    # "cd_s_light": (Parameters["lightCdS"], 0), #.02
     # # Time delay between parachute ejection signal is detected and parachute is inflated (s)
-    # "lag_rec": (FlightParams.Parameters["lag_rec"], 0), #.2
+    # "lag_rec": (Parameters["lag_rec"], 0), #.2
     # # Time delay between sensor signal is received and ejection signal is fired (s)
-    # "lag_se": (FlightParams.Parameters["lag_se"], 0), #.1
+    # "lag_se": (Parameters["lag_se"], 0), #.1
 
     # temperature in kelvin
     "temperature": (Parameters["temperature"], 0), #5
@@ -386,21 +336,9 @@ def setup_logging():
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-# note: returns whether or not we're fully done
-def UpdateIndices():
-    for i in range(len(Parameters["true_names"]) - 1, -1, -1):
-        if(Parameters["true_current_indices"][i] < len(Parameters["true_ranges"][i]) - 1):
-            Parameters["true_current_indices"][i] += 1
-            return False
-        else:
-            Parameters["true_current_indices"][i] = 0
+#Non Rocket Parameters
 
-    return True
 
-def NextIteration():
-    everythingFinished = UpdateIndices()
-    if everythingFinished:
-        return True
-
-    UpdateIterativeVariables()
-    return False
+if(Parameters["doing_monte_carlo"]):
+    Parameters["iterative_handler"] = IterationManager(Parameters["start_day"])
+    Parameters["iterative_handler"].UpdateIterativeVariables(Parameters)

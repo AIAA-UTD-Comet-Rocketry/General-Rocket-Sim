@@ -2,7 +2,7 @@ from rocketpy import Environment, SolidMotor, Rocket, Flight
 from numpy.random import normal, choice
 from time import process_time
 import pandas as pd
-from Helpers import FlightParams
+from Helpers.FlightParams import Parameters
 import logging
 
 # Configure logging
@@ -16,80 +16,80 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
     flightData = ["", "", ""]
 
     
-    env = Environment(latitude=FlightParams.Parameters["latitude"], longitude=FlightParams.Parameters["longitude"], elevation=FlightParams.Parameters["elevation"], date=[*FlightParams.Parameters["day"], int(FlightParams.Parameters["hour"])])
-    env.set_atmospheric_model(type=FlightParams.Parameters["atmosphere_type"], file=FlightParams.Parameters["env_file"], wind_u=FlightParams.Parameters["wind_u"], wind_v=FlightParams.Parameters["wind_v"], pressure=FlightParams.Parameters["pressure"])
+    env = Environment(latitude=Parameters["latitude"], longitude=Parameters["longitude"], elevation=Parameters["elevation"], date=[*Parameters["day"], int(Parameters["hour"])])
+    env.set_atmospheric_model(type=Parameters["atmosphere_type"], file=Parameters["env_file"], wind_u=Parameters["wind_u"], wind_v=Parameters["wind_v"], pressure=Parameters["pressure"])
     i=0
 
-    if not FlightParams.Parameters["doing_monte_carlo"]:
+    if not Parameters["doing_monte_carlo"]:
         numOfSims = 1
-    settings = flight_settings(FlightParams.Parameters["monte_carlo_parameters"], numOfSims)
+    settings = flight_settings(Parameters["monte_carlo_parameters"], numOfSims)
 
     for setting in settings:
         start_time = process_time()
         # env.set_atmospheric_model(type=envParams["atmosphere_type"], temperature =envParams["temperature"])
         MotorOne = SolidMotor(
-            thrust_source="../InputFiles/" + FlightParams.Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
-            burn_time = FlightParams.Parameters["burn_time"],#Straight from thrustcurve.org
-            reshape_thrust_curve=(FlightParams.Parameters["burn_time"], setting["impulse"]),
+            thrust_source="../InputFiles/" + Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
+            burn_time = Parameters["burn_time"],#Straight from thrustcurve.org
+            reshape_thrust_curve=(Parameters["burn_time"], setting["impulse"]),
             nozzle_radius= setting["nozzle_radius"], # Part List
             throat_radius= setting["throat_radius"], # Part List
-            grain_number=FlightParams.Parameters["numGrains"], #Based on cross-section
-            grain_separation= FlightParams.Parameters["grainSeparation"], # Good
+            grain_number=Parameters["numGrains"], #Based on cross-section
+            grain_separation= Parameters["grainSeparation"], # Good
             grain_density= setting["grain_density"], #Calculated mass of grain / volume of grain , for this i did - the core since it should be empty? not sure
-            grain_outer_radius= FlightParams.Parameters["grainOuterRadius"], # Good
+            grain_outer_radius= Parameters["grainOuterRadius"], # Good
             grain_initial_inner_radius= setting["grain_initial_inner_radius"], # Good
             grain_initial_height= setting["grain_initial_height"] , # Good
             interpolation_method = "linear",
             coordinate_system_orientation="combustion_chamber_to_nozzle",
-            nozzle_position = FlightParams.Parameters["the_nozzle_position"],#eyeballed
-            grains_center_of_mass_position= FlightParams.Parameters["grain_center_of_mass_position"],
+            nozzle_position = Parameters["the_nozzle_position"],#eyeballed
+            grains_center_of_mass_position= Parameters["grain_center_of_mass_position"],
             dry_mass=setting["motor_dry_mass"], #kg thrustcurve
-            dry_inertia=(FlightParams.Parameters["motor_11_inertia"], FlightParams.Parameters["motor_11_inertia"], FlightParams.Parameters["motor_33_inertia"]), #based off drawing
-            center_of_dry_mass_position= FlightParams.Parameters["center_of_dry_mass_within_motor"],
+            dry_inertia=(Parameters["motor_11_inertia"], Parameters["motor_11_inertia"], Parameters["motor_33_inertia"]), #based off drawing
+            center_of_dry_mass_position= Parameters["center_of_dry_mass_within_motor"],
         )
         #Pretty Much done except grain density and maybe nozz)le position
 
         Sp25 = Rocket(
             mass = setting["rocket_mass"], #OpenRocket
-            radius = FlightParams.Parameters["rocket_radius"], #OpenRocket
-            inertia = (FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralDiameter"], FlightParams.Parameters["spCentralAxis"]), # Calculated via Open Rocket
+            radius = Parameters["rocket_radius"], #OpenRocket
+            inertia = (Parameters["spCentralDiameter"], Parameters["spCentralDiameter"], Parameters["spCentralAxis"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
-            center_of_mass_without_motor = FlightParams.Parameters["the_center_of_mass_without_motor"], # OpenRocket
-            power_off_drag ="../InputFiles/" + str(FlightParams.Parameters["power_off_file"]), #Uploaded to drive
-            power_on_drag = "../InputFiles/" + str(FlightParams.Parameters["power_on_file"]), #Uploaded to drive
+            center_of_mass_without_motor = Parameters["the_center_of_mass_without_motor"], # OpenRocket
+            power_off_drag ="../InputFiles/" + str(Parameters["power_off_file"]), #Uploaded to drive
+            power_on_drag = "../InputFiles/" + str(Parameters["power_on_file"]), #Uploaded to drive
         )
 
 
         nose_cone = Sp25.add_nose(
-            length = FlightParams.Parameters["nose_cone_length"], kind = FlightParams.Parameters["nose_cone_type"], position = FlightParams.Parameters["nose_position"])
-        fin_set = Sp25.add_trapezoidal_fins(n=FlightParams.Parameters["num_fins"], root_chord= FlightParams.Parameters["root_chord"], tip_chord=FlightParams.Parameters["tip_chord"], span=FlightParams.Parameters["fin_span"],
-            position = FlightParams.Parameters["fin_position"],cant_angle=FlightParams.Parameters["fin_cant_angle"], sweep_length=FlightParams.Parameters["fin_sweep_length"])
+            length = Parameters["nose_cone_length"], kind = Parameters["nose_cone_type"], position = Parameters["nose_position"])
+        fin_set = Sp25.add_trapezoidal_fins(n=Parameters["num_fins"], root_chord= Parameters["root_chord"], tip_chord=Parameters["tip_chord"], span=Parameters["fin_span"],
+            position = Parameters["fin_position"],cant_angle=Parameters["fin_cant_angle"], sweep_length=Parameters["fin_sweep_length"])
         
-        if(FlightParams.Parameters["hasBottail"]):
-            boattail = Sp25.add_tail(top_radius = FlightParams.Parameters["rocket_radius"], bottom_radius = FlightParams.Parameters["boattail_bottom_radius"],length = FlightParams.Parameters["boattail_length"],position = FlightParams.Parameters["boattailPos"])
+        if(Parameters["hasBottail"]):
+            boattail = Sp25.add_tail(top_radius = Parameters["rocket_radius"], bottom_radius = Parameters["boattail_bottom_radius"],length = Parameters["boattail_length"],position = Parameters["boattailPos"])
 
-        if(FlightParams.Parameters["using-airbrakes"]):
+        if(Parameters["using-airbrakes"]):
             Sp25.add_air_brakes(
-                drag_coefficient_curve= FlightParams.Parameters["air_brake_drag"],
+                drag_coefficient_curve= Parameters["air_brake_drag"],
                 # drag_coefficient_curve= 1,
-                controller_function= FlightParams.Parameters["airbrake_policy"].airbrake_controller_function,
-                sampling_rate= FlightParams.Parameters["airbrake_sample_rate"],
-                reference_area = FlightParams.Parameters["airbrake_area"],
-                clamp = FlightParams.Parameters["airbrake_clamp"],
+                controller_function= Parameters["airbrake_policy"].airbrake_controller_function,
+                sampling_rate= Parameters["airbrake_sample_rate"],
+                reference_area = Parameters["airbrake_area"],
+                clamp = Parameters["airbrake_clamp"],
                 initial_observed_variables=[0, 0, 0],
-                override_rocket_drag= FlightParams.Parameters["override_rocketdrag_with_airbrakedrag"],
+                override_rocket_drag= Parameters["override_rocketdrag_with_airbrakedrag"],
                 name = "Air brakes",
             )
 
-        Sp25.add_motor(MotorOne, FlightParams.Parameters["the_motor_position"])
+        Sp25.add_motor(MotorOne, Parameters["the_motor_position"])
         
         rail_buttons = Sp25.set_rail_buttons(
-            upper_button_position= FlightParams.Parameters["upper_railbutton_position"],
-            lower_button_position= FlightParams.Parameters["lower_railbutton_position"],
-            angular_position=FlightParams.Parameters["railbutton_angular_position"]
+            upper_button_position= Parameters["upper_railbutton_position"],
+            lower_button_position= Parameters["lower_railbutton_position"],
+            angular_position=Parameters["railbutton_angular_position"]
         )
 
-        for parachute in FlightParams.Parameters["parachutes"].values():
+        for parachute in Parameters["parachutes"].values():
             Sp25.add_parachute(
                 parachute["name"],
                 cd_s = parachute["cd"],
@@ -114,17 +114,17 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             Sp25.draw()
             # Sp25.all_info()
 
-            print("Center of mass without motor is currently set to: " + str(FlightParams.Parameters["the_center_of_mass_without_motor"]))
+            print("Center of mass without motor is currently set to: " + str(Parameters["the_center_of_mass_without_motor"]))
 
             testFlight = Flight(
-                rocket=Sp25, environment=env,rail_length = FlightParams.Parameters["rail_length"],inclination = setting["inclination"],
-                heading=setting["heading"], terminate_on_apogee = FlightParams.Parameters["terminate_at_apogee"]
+                rocket=Sp25, environment=env,rail_length = Parameters["rail_length"],inclination = setting["inclination"],
+                heading=setting["heading"], terminate_on_apogee = Parameters["terminate_at_apogee"]
             )
             print('printing ts crack')
             testFlight.plots.trajectory_3d()
             testFlight.info()
             print("flgith complete1")
-            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env, FlightParams.Parameters["terminate_at_apogee"])
+            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env, Parameters["terminate_at_apogee"])
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])
 
