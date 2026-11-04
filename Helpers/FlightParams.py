@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 import logging
 
-from Helpers import LookupTable
+from Helpers.LookupTable import LookupTable
 from rocketpy import Environment
 import json
 from rocketpy.mathutils.function import Function
@@ -18,7 +18,7 @@ Parameters["start_day"] = date.today()
 
 Parameters["day"] = [Parameters["start_day"].year, Parameters["start_day"].month, Parameters["start_day"].day]
 Parameters["hour"] = 14
-Parameters["doing_monte_carlo"] = True
+Parameters["doing_monte_carlo"] = False
 
 #Non Rocket Parameters
 varyingPossibilitiesName = ["Fin Position", "Day", "Hour"]
@@ -189,7 +189,7 @@ Parameters["heading"] = 240
 Parameters["rail_length"] = 7.096
 
 #airbrakes
-Parameters["using-airbrakes"] = True
+Parameters["using-airbrakes"] = False
 if(Parameters["using-airbrakes"]):
     Parameters["air_brake_drag"] = "../InputFiles/AirbrakeDrag.csv"
     Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
@@ -281,8 +281,6 @@ Parameters["nose_position"] = 0
 
 def calcKelvinfromFahrenheit(fTemp):
     return (fTemp - 32) * 5/9 + 273.15
-
-Parameters["airbrake_controller_function"] = airbrake_controller_function
 
 newTempArr = []
 if isinstance(Parameters["fahrenheit_temp"], float) or isinstance(Parameters["fahrenheit_temp"], int):
