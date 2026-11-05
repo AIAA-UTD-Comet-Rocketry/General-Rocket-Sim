@@ -67,7 +67,7 @@ class LookupTable(Airbrake):
         vx, vy, vz = state[3], state[4], state[5]
         e0, e1, e2, e3 = state[6], state[7], state[8], state[9]
 
-        print(f"E0: {e0}, E1: {e1}, E2: {e2}, E3: {e3}")
+        # print(f"E0: {e0}, E1: {e1}, E2: {e2}, E3: {e3}")
 
 
         # Get winds in x and y directions
@@ -91,7 +91,7 @@ class LookupTable(Airbrake):
         # Example quaternion in (w, x, y, z)
         pitch = self.getPitch(np.array([e0, e1, e2, e3]))  # ~15° rotation around Y
 
-        print("Angle from flat plane (deg):", pitch)
+        # print("Angle from flat plane (deg):", pitch)
 
         # ALTITUDES IS COLUMN, VELCOITIES IS ROWS
 
@@ -104,9 +104,9 @@ class LookupTable(Airbrake):
         altitudeIndex = len(self.altitudeVals) - altitudeIndex - 1
         angleIndex = len(self.angleVals) - angleIndex - 1
 
-        print(f"The goddamn altitude: {above_ground_altitude}")
-        print(f"The altitude index is: {altitudeIndex}, while the number of altitudes is {len(self.altitudeVals)}")
-        print(f"The velocity index is: {velocityIndex}, while the number of altitudes is {len(self.velocityVals)}")
+        # print(f"The goddamn altitude: {above_ground_altitude}")
+        # print(f"The altitude index is: {altitudeIndex}, while the number of altitudes is {len(self.altitudeVals)}")
+        # print(f"The velocity index is: {velocityIndex}, while the number of altitudes is {len(self.velocityVals)}")
         # print(altitudeVals)
 
         # print(f"row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}")
@@ -115,7 +115,7 @@ class LookupTable(Airbrake):
         deploymentLevel = self.table.iloc[angleIndex * self.numVelPoints + velocityIndex][altitudeIndex] / 127.0
 
 
-        print(f"Our aaltitude was {above_ground_altitude}, our velocity Y was {vz}, our angle was {pitch}")
+        # print(f"Our aaltitude was {above_ground_altitude}, our velocity Y was {vz}, our angle was {pitch}")
 
 
 
@@ -123,8 +123,8 @@ class LookupTable(Airbrake):
         if (vz > 0 and time > self.burnoutTime):
             air_brakes.deployment_level = deploymentLevel
             canDeployAirbrake = True
-            print(f"WE CAN DEPLOY! Deployment level is {air_brakes.deployment_level}. Also, time is {time}, row value we're getting is {angleIndex * self.numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
-                angle value is {angleIndex} and velocity index is {velocityIndex}")
+            # print(f"WE CAN DEPLOY! Deployment level is {air_brakes.deployment_level}. Also, time is {time}, row value we're getting is {angleIndex * self.numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
+            #     angle value is {angleIndex} and velocity index is {velocityIndex}")
                 
         return (
             "airbrake" + str(canDeployAirbrake),

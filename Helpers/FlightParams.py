@@ -27,8 +27,6 @@ Parameters["has_bottail"] = False
 
 Parameters["obtaining_motor_csv"] = True
 
-Parameters["number_sims"] = 5
-Parameters["processes"] = 5
 Parameters["latitude"] = 31.043722
 Parameters["longitude"] = -103.532806
 
@@ -70,28 +68,28 @@ Parameters["generated_files_location"] = "../Output/"
 
 
 #motor
-Parameters["dry_motor_mass"] = 4.85
+Parameters["motor_dry_mass"] = 4.85
 Parameters["propellant_mass"] = 9.256 - 4.853
 Parameters["grain_inner_radius"] = .02
 Parameters["grain_outer_radius"] = .04
 Parameters["grain_height"] = 0.127
-Parameters["the_nozzle_radius"] = 0.098 / 2
-Parameters["the_throat_radius"] = .02286
-Parameters["the_nozzle_position"] = Parameters["grain_height"] * 4.25
+Parameters["nozzle_radius"] = 0.098 / 2
+Parameters["throat_radius"] = .02286
+Parameters["nozzle_position"] = Parameters["grain_height"] * 4.25
 Parameters["grain_center_of_mass_position"] = 0
 Parameters["center_of_dry_mass_within_motor"] = 0
 Parameters["motor_thrust_file"] = "FUUUUCK.eng"
 Parameters["burn_time"] = 3.35
 Parameters["num_grains"] = 6
 Parameters["grain_separation"] = .003175
-Parameters["the_motor_position"] = 2.204 + .614/2
+Parameters["motor_position"] = 2.204 + .614/2
 
 #rocket general
 Parameters["rocket_mass"] = 14.953
 Parameters["rocket_radius"] = 0.154686/2
 Parameters["rocket_length"] = 3.08
-Parameters["the_center_of_mass_without_motor"] = 1.8
-Parameters["rocket_center_of_dry_mass_position"] = Parameters["the_center_of_mass_without_motor"]
+Parameters["center_of_mass_without_motor"] = 1.8
+Parameters["rocket_center_of_dry_mass_position"] = Parameters["center_of_mass_without_motor"]
 Parameters["power_off_file"] = "2026LSCCDOFF.csv"
 Parameters["power_on_file"] = "2026LSCCDON.csv"
 
@@ -128,13 +126,13 @@ Parameters["heading"] = 240
 Parameters["rail_length"] = 7.096
 
 #airbrakes
-Parameters["using_airbrakes"] = False
+Parameters["using_airbrakes"] = True
 
 if(Parameters["using_airbrakes"]):
     Parameters["air_brake_drag"] = "../InputFiles/AirbrakeDrag.csv"
     Parameters["airbrake_sample_rate"] = 100 # 1 herz, so every .1 seconds
     Parameters["airbrake_clamp"] = True
-    Parameters["override_rocketdrag"] = True
+    Parameters["override_rocket_drag"] = True
     Parameters["airbrake_area"] = 2 # in meters
     Parameters["airbrake_policy"] = LookupTable(Parameters["burn_time"])
 
@@ -185,19 +183,20 @@ print("\n\nVARIABLES END\n\n")
 
 # HERE ARE THE VARIABLES YOU DON'T HAVE TO CHANGE
 
+Parameters["rocket_axis"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2
 
 
-Parameters["rocket_inertia_11"] = Parameters["rocket_diameter"]
+Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2
 Parameters["rocket_inertia_33"] = Parameters["rocket_axis"]
 
-Parameters["total_motor_mass"] = Parameters["dry_motor_mass"] + Parameters["propellant_mass"]
+Parameters["total_motor_mass"] = Parameters["motor_dry_mass"] + Parameters["propellant_mass"]
 Parameters["motor_length"] = Parameters["grain_height"] * Parameters["num_grains"]
 # area = pi * r^2 * height
 Parameters["motor_volume"] = (((np.pi * Parameters["grain_outer_radius"] ** 2) - (np.pi * Parameters["grain_inner_radius"] ** 2)) * Parameters["motor_length"])
-Parameters["motor_inertia_11"] = (1/12)*Parameters["dry_motor_mass"]*(Parameters["grain_outer_radius"])**2
+Parameters["motor_inertia_11"] = (1/12)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2
 Parameters["motor_density"] = Parameters["propellant_mass"]/Parameters["motor_volume"]
-Parameters["motor_inertia_33"] = ((1/4)*Parameters["dry_motor_mass"]*(Parameters["grain_outer_radius"])**2) + (1/12)*Parameters["dry_motor_mass"]*(Parameters["motor_length"])**2
-Parameters["the_motor_center_of_dry_mass_position"] = Parameters["the_motor_position"]
+Parameters["motor_inertia_33"] = ((1/4)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2) + (1/12)*Parameters["motor_dry_mass"]*(Parameters["motor_length"])**2
+Parameters["the_motor_center_of_dry_mass_position"] = Parameters["motor_position"]
 
 _, _, points = motor.Motor.import_eng("../InputFiles/" + Parameters["motor_thrust_file"])
 points = np.asarray(points, dtype=float)
@@ -209,7 +208,6 @@ Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
 
 print(f"Impulse is: {Parameters['impulse']}")
 
-Parameters["rocket_axis"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2
 Parameters["rocket_diamater"] = ((1/4)*Parameters["rocket_mass"]*(Parameters["rocket_radius"])**2) + (1/12)*Parameters["rocket_mass"]*(Parameters["rocket_length"])**2
 
 Parameters["power_off"] = 1
@@ -230,15 +228,7 @@ else:
         newTempArr.append((Parameters["fahrenheit_temp"][i][0], calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"][i][1])))
     Parameters["temperature"] = newTempArr
 
-Parameters["monte_carlo"] = MonteCarloManager(Parameters)
-
-if(Parameters["doing_monte_carlo"]):
-    pass
-else:
-    for key in Parameters["monte_carlo_parameters"].keys():
-        value = Parameters["monte_carlo_parameters"][key]
-        Parameters["monte_carlo_parameters"][key] = (value[0], 0)
-
+Parameters["monte_carlo"] = MonteCarloManager(Parameters, Parameters["doing_monte_carlo"])
 
 #sets up the ability to log inputs.
 def setup_logging():

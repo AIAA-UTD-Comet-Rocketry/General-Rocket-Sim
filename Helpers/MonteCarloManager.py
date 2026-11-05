@@ -3,8 +3,10 @@ from numpy.random import normal, choice
 class MonteCarloManager():
     def __init__(self, Parameters, inUse):
         self.variables = {}
+        self.num_sims = 5
+        self.num_processes = 5
         if inUse:
-            self.variables["spMass"] = {
+            self.variables["rocket_mass"] = {
                 "type": "normal",
                 "deviation": 4
             }
@@ -16,7 +18,7 @@ class MonteCarloManager():
                 "type": "normal",
                 "deviation": 0/5
             }
-            self.variables["dry_motor_mass"] = {
+            self.variables["motor_dry_mass"] = {
                 "type": "normal",
                 "deviation": 0
             }
@@ -72,7 +74,7 @@ class MonteCarloManager():
             self.PopulateMeans(Parameters)
 
     def PopulateMeans(self, Parameters):
-        for key in self.variables.keys:
+        for key in self.variables.keys():
             if key not in Parameters:
                 raise KeyError(f"Did not find {key} in Parameters!")
             else:
@@ -90,7 +92,7 @@ class MonteCarloManager():
 
     def SetSampledValues(self, Parameters):
         flight_setting = {}
-        for key in self.variables.keys:
+        for key in self.variables.keys():
             sampledVal = self.SampleValue(key)
             Parameters[key] = sampledVal
             flight_setting[key] = sampledVal

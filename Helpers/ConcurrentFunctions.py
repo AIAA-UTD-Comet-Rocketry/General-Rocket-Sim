@@ -24,7 +24,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
         numOfSims = 1
 
     for i in range(numOfSims):
-        settings = Parameters["MonteCarloManager"].SetSampledValues(Parameters)
+        settings = Parameters["monte_carlo"].SetSampledValues(Parameters)
         start_time = process_time()
         # env.set_atmospheric_model(type=envParams["atmosphere_type"], temperature =envParams["temperature"])
         MotorOne = SolidMotor(
@@ -35,13 +35,13 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             throat_radius= Parameters["throat_radius"], # Part List
             grain_number=Parameters["num_grains"], #Based on cross-section
             grain_separation= Parameters["grain_separation"], # Good
-            grain_density= Parameters["grain_density"], #Calculated mass of grain / volume of grain , for this i did - the core since it should be empty? not sure
+            grain_density= Parameters["motor_density"], #Calculated mass of grain / volume of grain , for this i did - the core since it should be empty? not sure
             grain_outer_radius= Parameters["grain_outer_radius"], # Good
-            grain_initial_inner_radius= Parameters["grain_initial_inner_radius"], # Good
-            grain_initial_height= Parameters["grain_initial_height"] , # Good
+            grain_initial_inner_radius= Parameters["grain_inner_radius"], # Good
+            grain_initial_height= Parameters["grain_height"] , # Good
             interpolation_method = "linear",
-            motor_volume="combustion_chamber_to_nozzle",
-            nozzle_position = Parameters["the_nozzle_position"],#eyeballed
+            coordinate_system_orientation="combustion_chamber_to_nozzle",
+            nozzle_position = Parameters["nozzle_position"],#eyeballed
             grains_center_of_mass_position= Parameters["grain_center_of_mass_position"],
             dry_mass=Parameters["motor_dry_mass"], #kg thrustcurve
             dry_inertia=(Parameters["motor_inertia_11"], Parameters["motor_inertia_11"], Parameters["motor_inertia_33"]), #based off drawing
@@ -54,7 +54,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             radius = Parameters["rocket_radius"], #OpenRocket
             inertia = (Parameters["rocket_inertia_11"], Parameters["rocket_inertia_11"], Parameters["rocket_inertia_33"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
-            center_of_mass_without_motor = Parameters["the_center_of_mass_without_motor"], # OpenRocket
+            center_of_mass_without_motor = Parameters["center_of_mass_without_motor"], # OpenRocket
             power_off_drag ="../InputFiles/" + str(Parameters["power_off_file"]), #Uploaded to drive
             power_on_drag = "../InputFiles/" + str(Parameters["power_on_file"]), #Uploaded to drive
         )
@@ -65,10 +65,10 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
         fin_set = Sp25.add_trapezoidal_fins(n=Parameters["num_fins"], root_chord= Parameters["root_chord"], tip_chord=Parameters["tip_chord"], span=Parameters["fin_span"],
             position = Parameters["fin_position"],cant_angle=Parameters["fin_cant_angle"], sweep_length=Parameters["fin_sweep_length"])
         
-        if(Parameters["hasBottail"]):
+        if(Parameters["has_bottail"]):
             boattail = Sp25.add_tail(top_radius = Parameters["rocket_radius"], bottom_radius = Parameters["boattail_bottom_radius"],length = Parameters["boattail_length"],position = Parameters["boattailPos"])
 
-        if(Parameters["using-airbrakes"]):
+        if(Parameters["using_airbrakes"]):
             Sp25.add_air_brakes(
                 drag_coefficient_curve= Parameters["air_brake_drag"],
                 # drag_coefficient_curve= 1,
@@ -77,11 +77,11 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
                 reference_area = Parameters["airbrake_area"],
                 clamp = Parameters["airbrake_clamp"],
                 initial_observed_variables=[0, 0, 0],
-                override_rocket_drag= Parameters["override_rocketdrag_with_airbrakedrag"],
+                override_rocket_drag= Parameters["override_rocket_drag"],
                 name = "Air brakes",
             )
 
-        Sp25.add_motor(MotorOne, Parameters["the_motor_position"])
+        Sp25.add_motor(MotorOne, Parameters["motor_position"])
         
         rail_buttons = Sp25.set_rail_buttons(
             upper_button_position= Parameters["upper_railbutton_position"],
@@ -114,7 +114,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             Sp25.draw()
             # Sp25.all_info()
 
-            print("Center of mass without motor is currently set to: " + str(Parameters["the_center_of_mass_without_motor"]))
+            print("Center of mass without motor is currently set to: " + str(Parameters["center_of_mass_without_motor"]))
 
             testFlight = Flight(
                 rocket=Sp25, environment=env,rail_length = Parameters["rail_length"], inclination = Parameters["inclination"],
