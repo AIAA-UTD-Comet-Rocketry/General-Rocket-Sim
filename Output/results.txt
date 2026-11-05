@@ -1,20 +1,20 @@
 TOTAL SIMS IS: 5
 
 
-Completed 5 iterations successfully. Total CPU time: 0.0625 s. Total wall time: 11.337801933288574 s
+Completed 5 iterations successfully. Total CPU time: 0.140625 s. Total wall time: 13.622474193572998 s
 Number of simulations: 5
-Out Of Rail Stability Margin -         Mean Value: 3.199 
-Out Of Rail Stability Margin - Standard Deviation: 0.343 m
-PROBABILITY THE Out Of Rail Stability Margin IS IN BETWEEN 1.5 AND 4 IS: 99.02%
-There is a 90% chance that the mean of the Out Of Rail Stability Margin falls within THIS RANGE: 2.946351005362611, 3.451294664015507
+Out Of Rail Stability Margin -         Mean Value: 3.219 
+Out Of Rail Stability Margin - Standard Deviation: 0.265 m
+PROBABILITY THE Out Of Rail Stability Margin IS IN BETWEEN 1.5 AND 4 IS: 99.84%
+There is a 90% chance that the mean of the Out Of Rail Stability Margin falls within THIS RANGE: 3.024043349255261, 3.4133951528318818
 
 
-Apogee Altitude -         Mean Value: 2996.956 
-Apogee Altitude - Standard Deviation: 27.515 m
-PROBABILITY THE Apogee Altitude IS IN BETWEEN 3017.52 AND 3078.48 IS: 22.59%
-There is a 90% chance that the mean of the Apogee Altitude falls within THIS RANGE: 2976.7153776664395, 3017.1961178100696
+Apogee Altitude -         Mean Value: 2946.613 
+Apogee Altitude - Standard Deviation: 114.265 m
+PROBABILITY THE Apogee Altitude IS IN BETWEEN 3017.52 AND 3078.48 IS: 14.32%
+There is a 90% chance that the mean of the Apogee Altitude falls within THIS RANGE: 2862.559312303726, 3030.6661049971744
 
-We have the hypothesis that our mean is greater than or equal to 3048. With our critical percent, our critical value is -1.6448536269514729. Then, our test statistic is -4.148161479748562
+We have the hypothesis that our mean is greater than or equal to 3048. With our critical percent, our critical value is -1.6448536269514729. Then, our test statistic is -1.984063240171399
 Since our test statistic is more extreme than our critical value, we can reject the null hypothesis that the mean is 3048.
 
 
@@ -23,7 +23,7 @@ Since our test statistic is more extreme than our critical value, we can reject 
 ----------------------------------------------------------------------------------------------------
 
 
-Simulated Landing Position x = -487.18869532866654, y = -269.73728972063657
+Simulated Landing Position x = -491.34408964185076, y = -156.2288998111265
 
 
 

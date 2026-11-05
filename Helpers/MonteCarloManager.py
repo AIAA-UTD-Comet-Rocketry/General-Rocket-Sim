@@ -1,3 +1,4 @@
+import logging
 from numpy.random import normal, choice
 
 class MonteCarloManager():
@@ -73,6 +74,8 @@ class MonteCarloManager():
 
             self.PopulateMeans(Parameters)
 
+            self.setup_logging()
+
     def PopulateMeans(self, Parameters):
         for key in self.variables.keys():
             if key not in Parameters:
@@ -97,3 +100,17 @@ class MonteCarloManager():
             Parameters[key] = sampledVal
             flight_setting[key] = sampledVal
         return flight_setting
+    #sets up the ability to log inputs.
+    def setup_logging(self):
+        class MyHandler(logging.FileHandler):
+            def emit(self, record):
+                super().emit(record)  # Call the superclass's emit method
+                self.flush()  # Flush after each log message
+
+        # Use your custom handler
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+        handler = MyHandler('../Output/app.log', 'a')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)

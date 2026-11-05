@@ -109,8 +109,8 @@ Parameters["num_fins"] = 4
 #bottail
 if(Parameters["has_bottail"]):
     Parameters["bottail_pos"] = 0.813+0.152+0.305+0.508+0.864+0.152
-    Parameters["boattail_bottom_radius"] = 0.129/2
-    Parameters["boattail_length"] = 0.203
+    Parameters["bottail_bottom_radius"] = 0.129/2
+    Parameters["bottail_length"] = 0.203
 
 #rail buttons
 Parameters["lower_railbutton_position"] = 3.01
@@ -176,13 +176,6 @@ print("\n\nVARIABLES END\n\n")
 
 
 
-
-
-
-
-
-# HERE ARE THE VARIABLES YOU DON'T HAVE TO CHANGE
-
 Parameters["rocket_axis"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2
 
 
@@ -208,8 +201,6 @@ Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
 
 print(f"Impulse is: {Parameters['impulse']}")
 
-Parameters["rocket_diamater"] = ((1/4)*Parameters["rocket_mass"]*(Parameters["rocket_radius"])**2) + (1/12)*Parameters["rocket_mass"]*(Parameters["rocket_length"])**2
-
 Parameters["power_off"] = 1
 Parameters["power_on"] = 1
 Parameters["nose_position"] = 0
@@ -229,23 +220,6 @@ else:
     Parameters["temperature"] = newTempArr
 
 Parameters["monte_carlo"] = MonteCarloManager(Parameters, Parameters["doing_monte_carlo"])
-
-#sets up the ability to log inputs.
-def setup_logging():
-    class MyHandler(logging.FileHandler):
-        def emit(self, record):
-            super().emit(record)  # Call the superclass's emit method
-            self.flush()  # Flush after each log message
-
-    # Use your custom handler
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    handler = MyHandler('app.log', 'a')
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-#Non Rocket Parameters
 
 
 if(Parameters["doing_monte_carlo"]):

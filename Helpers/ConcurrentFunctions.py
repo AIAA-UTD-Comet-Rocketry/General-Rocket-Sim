@@ -66,7 +66,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             position = Parameters["fin_position"],cant_angle=Parameters["fin_cant_angle"], sweep_length=Parameters["fin_sweep_length"])
         
         if(Parameters["has_bottail"]):
-            boattail = Sp25.add_tail(top_radius = Parameters["rocket_radius"], bottom_radius = Parameters["boattail_bottom_radius"],length = Parameters["boattail_length"],position = Parameters["boattailPos"])
+            boattail = Sp25.add_tail(top_radius = Parameters["rocket_radius"], bottom_radius = Parameters["bottail_bottom_radius"],length = Parameters["bottail_length"],position = Parameters["bottailPos"])
 
         if(Parameters["using_airbrakes"]):
             Sp25.add_air_brakes(
