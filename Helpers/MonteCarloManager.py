@@ -1,68 +1,94 @@
+from numpy.random import normal, choice
+
 class MonteCarloManager():
     def __init__(self, Parameters, inUse):
-        self.varDict = {}
+        self.variables = {}
         if inUse:
-            self.varDict["spMass"] = {
+            self.variables["spMass"] = {
                 "type": "normal",
                 "deviation": 4
             }
-            self.varDict["rocket_inertia_11"] = {
+            self.variables["rocket_inertia_11"] = {
                 "type": "normal",
                 "deviation": 0.5
             }
-            self.varDict["rocket_inertia_33"] = {
+            self.variables["rocket_inertia_33"] = {
                 "type": "normal",
                 "deviation": 0/5
             }
-            self.varDict["dry_motor_mass"] = {
+            self.variables["dry_motor_mass"] = {
                 "type": "normal",
                 "deviation": 0
             }
-            self.varDict["motor_inertia_11"] = {
+            self.variables["motor_inertia_11"] = {
                 "type": "normal",
                 "deviation": 0
             }
-            self.varDict["motor_inertia_33"] = {
+            self.variables["motor_inertia_33"] = {
                 "type": "normal",
                 "deviation": 0
             }
-            self.varDict["impulse"] = {
+            self.variables["impulse"] = {
                 "type": "normal",
                 "deviation": 100
             }
-            self.varDict["motor_position"] = {
+            self.variables["motor_position"] = {
                 "type": "normal",
                 "deviation": 0
             }
-            self.varDict["burn_time"] = {
+            self.variables["burn_time"] = {
                 "type": "normal",
                 "deviation": 1
             }
-            self.varDict["motor_density"] = {
+            self.variables["motor_density"] = {
                 "type": "normal",
                 "deviation": 0.01
             }
-            self.varDict["rocket_radius"] = {
+            self.variables["rocket_radius"] = {
                 "type": "normal",
                 "deviation": 0.01
             }
-            self.varDict["inclination"] = {
+            self.variables["inclination"] = {
                 "type": "normal",
                 "deviation": 5
             }
-            self.varDict["heading"] = {
+            self.variables["heading"] = {
                 "type": "normal",
                 "deviation": 15
             }
-            self.varDict["temperature"] = {
+            self.variables["temperature"] = {
                 "type": "normal",
                 "deviation": 5
             }
-            self.varDict["fin_position"] = {
+            self.variables["fin_position"] = {
                 "type": "normal",
                 "deviation": 0.2
             }
-            self.varDict["atmosphere_pressure"] = {
+            self.variables["atmosphere_pressure"] = {
                 "type": "normal",
                 "deviation": 10
             }
+
+            self.PopulateMeans(Parameters)
+
+    def PopulateMeans(self, Parameters):
+        for key in self.variables.keys:
+            if key not in Parameters:
+                raise KeyError(f"Did not find {key} in Parameters!")
+            else:
+                self.variables[key]["mean"] = Parameters[key]
+
+    def SampleValue(self, key):
+        if key not in self.variables:
+            raise KeyError(f"DIT NOT FIND KEY {key}!")
+        else:
+            valuePair = self.variables[key]
+            if valuePair["type"] == "normal":
+                return normal(valuePair["mean"], valuePair["deviation"])
+            else:
+                raise ValueError(f"Key {key} has invalid type {valuePair["type"]}!")
+
+    def SetSampledValues(self, Parameters):
+        for key in self.variables.keys:
+            sampledVal = self.SampleValue(key)
+            Parameters[key] = sampledVal

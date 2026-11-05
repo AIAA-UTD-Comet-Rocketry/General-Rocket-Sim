@@ -33,7 +33,7 @@ class Airbrake(ABC):
         theta = np.arccos(np.clip(obj_up[2], -1.0, 1.0))  # radians
         pitch = np.degrees(theta)
         return 90 - pitch
-
-@abstractmethod
-def airbrake_controller_function(self, time, sampling_rate, state, state_history, observed_variables, air_brakes, sensors, env):
-    pass
+    
+    @abstractmethod
+    def airbrake_controller_function(self, time, sampling_rate, state, state_history, observed_variables, air_brakes, sensors, env):
+        pass
