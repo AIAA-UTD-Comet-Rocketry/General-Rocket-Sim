@@ -40,7 +40,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             grain_initial_inner_radius= setting["grain_initial_inner_radius"], # Good
             grain_initial_height= setting["grain_initial_height"] , # Good
             interpolation_method = "linear",
-            coordinate_system_orientation="combustion_chamber_to_nozzle",
+            motor_volume="combustion_chamber_to_nozzle",
             nozzle_position = Parameters["the_nozzle_position"],#eyeballed
             grains_center_of_mass_position= Parameters["grain_center_of_mass_position"],
             dry_mass=setting["motor_dry_mass"], #kg thrustcurve
@@ -52,7 +52,7 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
         Sp25 = Rocket(
             mass = setting["rocket_mass"], #OpenRocket
             radius = Parameters["rocket_radius"], #OpenRocket
-            inertia = (Parameters["spCentralDiameter"], Parameters["spCentralDiameter"], Parameters["spCentralAxis"]), # Calculated via Open Rocket
+            inertia = (Parameters["rocket_inertia_11"], Parameters["rocket_inertia_11"], Parameters["rocket_inertia_33"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
             center_of_mass_without_motor = Parameters["the_center_of_mass_without_motor"], # OpenRocket
             power_off_drag ="../InputFiles/" + str(Parameters["power_off_file"]), #Uploaded to drive
