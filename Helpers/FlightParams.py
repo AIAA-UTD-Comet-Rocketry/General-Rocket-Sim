@@ -153,23 +153,26 @@ env = Environment(
 
 Parameters["terminate_at_apogee"] = False
 
-print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
+Parameters["use_openrocket"] = True
 
 
-with open("../InputFiles/RelevantOpenRocket.json", "r") as f:
-    jsonData = json.load(f)
-for key in Parameters:
-    # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
-    # or something like that
-    
-    if key in jsonData:
-        # print(f"Found {key} in the json, setting it now!")
-        Parameters[key] = jsonData[key]
-    else:
-        print(f"{key},")
 
-print("\n\nVARIABLES END\n\n")
-
+if Parameters["use_openrocket"]:
+    print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
+    with open("../InputFiles/RelevantOpenRocket.json", "r") as f:
+        jsonData = json.load(f)
+    for key in Parameters:
+        # first do something like check if rail_position, if so get rail_id and from that do f"rail_{rail_id}_mass"
+        # or something like that
+        
+        if key in jsonData:
+            # print(f"Found {key} in the json, setting it now!")
+            Parameters[key] = jsonData[key]
+        else:
+            print(f"{key},")
+    print("\n\nVARIABLES END\n\n")
+else:
+    print("IMPORTANCE NOTICE! You are currently not importing a Openrocket file for your values, and thus are using those specified in FlightParams.py. Make sure every variable above this print is set accurately!")
 
 
 
