@@ -89,6 +89,9 @@ class MonteCarloManager():
                 raise ValueError(f"Key {key} has invalid type {valuePair["type"]}!")
 
     def SetSampledValues(self, Parameters):
+        flight_setting = {}
         for key in self.variables.keys:
             sampledVal = self.SampleValue(key)
             Parameters[key] = sampledVal
+            flight_setting[key] = sampledVal
+        return flight_setting

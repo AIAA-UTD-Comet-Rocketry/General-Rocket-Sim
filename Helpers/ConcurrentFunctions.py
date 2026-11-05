@@ -22,35 +22,35 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
 
     if not Parameters["doing_monte_carlo"]:
         numOfSims = 1
-    settings = flight_settings(Parameters["monte_carlo_parameters"], numOfSims)
 
-    for setting in settings:
+    for i in range(numOfSims):
+        settings = Parameters["MonteCarloManager"].SetSampledValues(Parameters)
         start_time = process_time()
         # env.set_atmospheric_model(type=envParams["atmosphere_type"], temperature =envParams["temperature"])
         MotorOne = SolidMotor(
             thrust_source="../InputFiles/" + Parameters["motor_thrust_file"], #Thrustcurve.org Mike Haberer - Rock Sim, Also uploaded to Google
             burn_time = Parameters["burn_time"],#Straight from thrustcurve.org
-            reshape_thrust_curve=(Parameters["burn_time"], setting["impulse"]),
-            nozzle_radius= setting["nozzle_radius"], # Part List
-            throat_radius= setting["throat_radius"], # Part List
-            grain_number=Parameters["numGrains"], #Based on cross-section
-            grain_separation= Parameters["grainSeparation"], # Good
-            grain_density= setting["grain_density"], #Calculated mass of grain / volume of grain , for this i did - the core since it should be empty? not sure
-            grain_outer_radius= Parameters["grainOuterRadius"], # Good
-            grain_initial_inner_radius= setting["grain_initial_inner_radius"], # Good
-            grain_initial_height= setting["grain_initial_height"] , # Good
+            reshape_thrust_curve=(Parameters["burn_time"], Parameters["impulse"]),
+            nozzle_radius= Parameters["nozzle_radius"], # Part List
+            throat_radius= Parameters["throat_radius"], # Part List
+            grain_number=Parameters["num_grains"], #Based on cross-section
+            grain_separation= Parameters["grain_separation"], # Good
+            grain_density= Parameters["grain_density"], #Calculated mass of grain / volume of grain , for this i did - the core since it should be empty? not sure
+            grain_outer_radius= Parameters["grain_outer_radius"], # Good
+            grain_initial_inner_radius= Parameters["grain_initial_inner_radius"], # Good
+            grain_initial_height= Parameters["grain_initial_height"] , # Good
             interpolation_method = "linear",
             motor_volume="combustion_chamber_to_nozzle",
             nozzle_position = Parameters["the_nozzle_position"],#eyeballed
             grains_center_of_mass_position= Parameters["grain_center_of_mass_position"],
-            dry_mass=setting["motor_dry_mass"], #kg thrustcurve
-            dry_inertia=(Parameters["motor_11_inertia"], Parameters["motor_11_inertia"], Parameters["motor_33_inertia"]), #based off drawing
+            dry_mass=Parameters["motor_dry_mass"], #kg thrustcurve
+            dry_inertia=(Parameters["motor_inertia_11"], Parameters["motor_inertia_11"], Parameters["motor_inertia_33"]), #based off drawing
             center_of_dry_mass_position= Parameters["center_of_dry_mass_within_motor"],
         )
         #Pretty Much done except grain density and maybe nozz)le position
 
         Sp25 = Rocket(
-            mass = setting["rocket_mass"], #OpenRocket
+            mass = Parameters["rocket_mass"], #OpenRocket
             radius = Parameters["rocket_radius"], #OpenRocket
             inertia = (Parameters["rocket_inertia_11"], Parameters["rocket_inertia_11"], Parameters["rocket_inertia_33"]), # Calculated via Open Rocket
             coordinate_system_orientation = "nose_to_tail",
@@ -117,14 +117,14 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             print("Center of mass without motor is currently set to: " + str(Parameters["the_center_of_mass_without_motor"]))
 
             testFlight = Flight(
-                rocket=Sp25, environment=env,rail_length = Parameters["rail_length"],inclination = setting["inclination"],
-                heading=setting["heading"], terminate_on_apogee = Parameters["terminate_at_apogee"]
+                rocket=Sp25, environment=env,rail_length = Parameters["rail_length"], inclination = Parameters["inclination"],
+                heading=Parameters["heading"], terminate_on_apogee = Parameters["terminate_at_apogee"]
             )
             print('printing ts crack')
             testFlight.plots.trajectory_3d()
             testFlight.info()
             print("flgith complete1")
-            inputOutput = export_flight_data(setting, testFlight, process_time() - start_time, env, Parameters["terminate_at_apogee"])
+            inputOutput = export_flight_data(settings, testFlight, process_time() - start_time, env, Parameters["terminate_at_apogee"])
             flightData[0] += "\n" + str(inputOutput[0])
             flightData[1] += "\n" + str(inputOutput[1])
 
@@ -133,32 +133,12 @@ def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
             print("\n\n\n")
 
         except Exception as E:
-            flightData[2] += str(E) + "\n" + str(export_flight_error(setting))
+            flightData[2] += str(E) + "\n" + str(export_flight_error(settings))
         # Register time
         i+=1
         if(i % 10 == 0):
             logging.getLogger().info(f"Curent iteration: {i:06d} | Average Time per Iteration: {(process_time() - initial_cpu_time)/i:2.6f} s")
     return flightData
-
-def flight_settings(analysis_parameters, total_number):
-    i = 0
-    while i < total_number:
-        # Generate a flight setting
-        flight_setting = {}
-        for parameter_key, parameter_value in analysis_parameters.items():
-            if type(parameter_value) is tuple:
-                flight_setting[parameter_key] = normal(*parameter_value)
-            else:
-                flight_setting[parameter_key] = choice(parameter_value)
-
-        # # Skip if certain values are negative, which happens due to the normal curve but isnt realistic
-        # if flight_setting["lag_rec"] < 0 or flight_setting["lag_se"] < 0:
-        #     continue
-
-        # Update counter
-        i += 1
-        # Yield a flight setting
-        yield flight_setting
 
 def export_flight_data(flight_setting, flight_data, exec_time, env, termOnApogee):
     # Generate flight results
