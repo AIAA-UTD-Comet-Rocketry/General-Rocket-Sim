@@ -14,7 +14,7 @@ class IterationManager():
 
         self.CreateInitialIteratorValues(startDay)
 
-        self.iterative_variables = ["Day", "Hour"]
+        self.iterative_variables = []
 
         self.readable_names = []
         self.true_names = []

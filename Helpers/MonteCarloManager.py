@@ -8,15 +8,15 @@ class MonteCarloManager():
         if inUse:
             self.variables["rocket_mass"] = {
                 "type": "normal",
-                "deviation": 4
+                "deviation": 1
             }
             self.variables["rocket_inertia_11"] = {
                 "type": "normal",
-                "deviation": 0.5
+                "deviation": 0.005
             }
             self.variables["rocket_inertia_33"] = {
                 "type": "normal",
-                "deviation": 0/5
+                "deviation": 0.005
             }
             self.variables["motor_dry_mass"] = {
                 "type": "normal",
@@ -44,15 +44,15 @@ class MonteCarloManager():
             }
             self.variables["motor_density"] = {
                 "type": "normal",
-                "deviation": 0.01
+                "deviation": 0.001
             }
             self.variables["rocket_radius"] = {
                 "type": "normal",
-                "deviation": 0.01
+                "deviation": 0.001
             }
             self.variables["inclination"] = {
                 "type": "normal",
-                "deviation": 5
+                "deviation": 3
             }
             self.variables["heading"] = {
                 "type": "normal",
@@ -64,7 +64,7 @@ class MonteCarloManager():
             }
             self.variables["fin_position"] = {
                 "type": "normal",
-                "deviation": 0.2
+                "deviation": 0.01
             }
             self.variables["atmosphere_pressure"] = {
                 "type": "normal",
