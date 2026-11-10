@@ -339,5 +339,10 @@
         "zorder"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python-envs.defaultPackageManager": "ms-python.python:pip"
+    "python-envs.defaultPackageManager": "ms-python.python:pip",
+    "workbench.browser.showInTitleBar": false,
+    "workbench.browser.enableChatTools": false,
+    "workbench.browser.openLocalhostLinks": false,
+    "simpleBrowser.useIntegratedBrowser": false,
+    "livePreview.useIntegratedBrowser": false
 }
