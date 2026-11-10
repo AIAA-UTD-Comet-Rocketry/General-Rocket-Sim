@@ -6,7 +6,7 @@ from Helpers.FlightParams import Parameters
 import logging
 
 # Configure logging
-def RunFlightWithMonteCarlo(numOfSims, initial_cpu_time):
+def RunFlight(numOfSims, initial_cpu_time):
     logging.basicConfig(
         filename='app.log',  # Change this to your desired log file
         level=logging.INFO,

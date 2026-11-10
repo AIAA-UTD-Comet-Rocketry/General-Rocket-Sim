@@ -4,8 +4,8 @@ from numpy.random import normal, choice
 class MonteCarloManager():
     def __init__(self, Parameters, inUse):
         self.variables = {}
-        self.num_sims = 5
-        self.num_processes = 5
+        self.num_sims = 200
+        self.num_processes = 10
         if inUse:
             self.variables["rocket_mass"] = {
                 "type": "normal",

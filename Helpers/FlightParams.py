@@ -158,7 +158,7 @@ Parameters["use_openrocket"] = True
 
 
 if Parameters["use_openrocket"]:
-    print("YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
+    print("Using Openrocket file for parameters! YOU MUST STILL FILL IN THfE FOLLOWING VARIABLES:\nVARIABLES START\n\n")
     with open("../InputFiles/RelevantOpenRocket.json", "r") as f:
         jsonData = json.load(f)
     for key in Parameters:
