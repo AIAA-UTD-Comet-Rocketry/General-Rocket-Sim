@@ -1,2 +1,13 @@
 Welcome to our repository for interfacing with RocketPy for our own custom simulations! I'll first walk you through how to set it up, then talk aobut here all the important things are located.
 
+First, you ahve to 'clone' this repository onto your local machine. To do that, first install git on your machine if you don't have it already, which you can do here: https://git-scm.com/install/windows.
+
+Then, you can use git from your terminal to basically retrieve the code on Github. To do that, you can follow the following steps to git clone onto your computer: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository.
+
+Next, make sure you have python installed on your machine. I use Python 3.13.12, which I'd recommend installing as well. Any version about python 3.12 should work just fine though. You can install python here: https://www.python.org/downloads/. If you see a chechmakr like 'add to path', make sure to select that.
+
+Next, you almost have the setup done! Next, you'll have to set up a python "virtual environment" - this is where basically any python libraires you install only apply to this reposiotory and not all projects you have on your computer. To do this, from a computer terminal, you want to first do "python -m venv .venv" while making sure you type this command in the same place where your project is. If you get an error saying it doesn't recognize python, check if you added the python folder to the PATH environment variable.
+
+Next if the virtual environment is created successfully, you can do "source .venv/bin/activate" on linux/mac machines, or ".venv/Scripts/activate" on windows machines. This should activate the virtual environment and show it visually - if it doesn't, ur probalby still fine so long as it didn't error. Whenever you want to work in this project, you should make sure the virtual environment is activated whenever u run python files. Also, you should try to only install python libraries while the virtual environment's active.
+
+Next, all you really need to do now is just install all the python libraries. To do this, you should just be able to type "pip install -r requirements.txt", which will read the 'requirements.txt' file and automatically install the libraires there. Once again make sure to do this while the virtual environment's activated. If it gives an error saying somethingl ike how it doesn't know what pip is, make sure the virtual environment's activated.
