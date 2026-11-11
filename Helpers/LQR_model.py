@@ -94,7 +94,7 @@ plotting_func(return_sim.time,
               str_title='Position vs Time Graph',
               str_x_axis='Time [s]',
               str_y_axis='Position [m]',
-              str_file_name='OpenLoopResponse1.png')
+              str_file_name='../OpenLoopResponse1.png')
 # here we can see how an output of a simulation with a constant force of one (F),
 # it will ocilate until done, but we need ours much much faster
 
@@ -104,7 +104,7 @@ plotting_func(return_sim.time,
               str_title='Velocity vs Time Graph',
               str_x_axis='Time [s]',
               str_y_axis='Velocity [m/s]',
-              str_file_name='OpenLoopResponse2.png')
+              str_file_name='../OpenLoopResponse2.png')
 
 # alreadyhaving computed the system
 
@@ -146,13 +146,13 @@ plotting_func(return_sim.time,
               str_title='Position vs Time Graph',
               str_x_axis='Time [s]',
               str_y_axis='Position [m]',
-              str_file_name='OpenLoopResponse1.png')
+              str_file_name='../OpenLoopResponse1.png')
 plotting_func(return_sim.time,
               return_sim.states[1, :],
               str_title='Velocity vs Time Graph',
               str_x_axis='Time [s]',
               str_y_axis='Velocity [m/s]',
-              str_file_name='OpenLoopResponse2.png')
+              str_file_name='../OpenLoopResponse2.png')
 
 ####Finally we get into our LQR control:
 # assuming our desired state is zero for our LQR implementation
@@ -215,10 +215,10 @@ plotting_func(return_simcl.time,
               str_title= 'Position vs Time Graph',
               str_x_axis='Time [s]',
               str_y_axis='Position [m]',
-              str_file_name='OpenLoopResponse1.png') #1st state
+              str_file_name='../OpenLoopResponse1.png') #1st state
 plotting_func(return_simcl.time,
               return_simcl.states[1, :],
               str_title='Velocity vs Time Graph',
               str_x_axis='Time [s]',
               str_y_axis='Velocity [m/s]',
-              str_file_name='OpenLoopResponse2.png') #second state
+              str_file_name='../OpenLoopResponse2.png') #second state
