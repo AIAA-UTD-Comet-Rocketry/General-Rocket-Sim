@@ -20,7 +20,7 @@ Parameters["start_day"] = date.today()
 
 Parameters["day"] = [Parameters["start_day"].year, Parameters["start_day"].month, Parameters["start_day"].day]
 Parameters["hour"] = 14
-Parameters["doing_monte_carlo"] = True
+Parameters["doing_monte_carlo"] = False
 
 
 Parameters["has_bottail"] = False
@@ -53,8 +53,8 @@ Parameters["env_file"] = None
 
 Parameters["fahrenheit_temp"] = 67
 Parameters["pressure"] = None
-Parameters["wind_u"] = None
-Parameters["wind_v"] = None
+Parameters["wind_u"] = 1.25
+Parameters["wind_v"] = 1.25
 
 # (year, month, day, hour)
 
@@ -68,10 +68,10 @@ Parameters["generated_files_location"] = "../Output/"
 
 
 #motor
-Parameters["motor_dry_mass"] = 4.85
-Parameters["propellant_mass"] = 9.256 - 4.853
+Parameters["motor_dry_mass"] = 9.256236 - 4.403628
+Parameters["propellant_mass"] =  4.403628
 Parameters["grain_inner_radius"] = .02
-Parameters["grain_outer_radius"] = .04
+Parameters["grain_outer_radius"] = 0.098044196 / 2
 Parameters["grain_height"] = 0.127
 Parameters["nozzle_radius"] = 0.098 / 2
 Parameters["throat_radius"] = .02286
@@ -88,8 +88,7 @@ Parameters["motor_position"] = 2.204 + .614/2
 Parameters["rocket_mass"] = 14.953
 Parameters["rocket_radius"] = 0.154686/2
 Parameters["rocket_length"] = 3.08
-Parameters["center_of_mass_without_motor"] = 1.8
-Parameters["rocket_center_of_dry_mass_position"] = Parameters["center_of_mass_without_motor"]
+Parameters["center_of_mass_without_motor"] = 1.62
 Parameters["power_off_file"] = "2026LSCCDOFF.csv"
 Parameters["power_on_file"] = "2026LSCCDON.csv"
 
@@ -123,7 +122,7 @@ Parameters["railbutton_angular_position"] = 150
 #final rocket stuff
 Parameters["inclination"] = 84
 Parameters["heading"] = 240
-Parameters["rail_length"] = 7.096
+Parameters["rail_length"] = 4.19
 
 #airbrakes
 Parameters["using_airbrakes"] = True
@@ -178,12 +177,9 @@ else:
 
 
 
-
-Parameters["rocket_axis"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2
-
-
 Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2
-Parameters["rocket_inertia_33"] = Parameters["rocket_axis"]
+Parameters["rocket_inertia_33"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2
+
 
 Parameters["total_motor_mass"] = Parameters["motor_dry_mass"] + Parameters["propellant_mass"]
 Parameters["motor_length"] = Parameters["grain_height"] * Parameters["num_grains"]
@@ -203,10 +199,6 @@ thrust = Function(points, "Time (s)", "Thrust (N)", interpolation_method, "zero"
 Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
 
 print(f"Impulse is: {Parameters['impulse']}")
-
-Parameters["power_off"] = 1
-Parameters["power_on"] = 1
-Parameters["nose_position"] = 0
 
 Parameters["atmosphere_pressure"] = env.pressure_ISA(Parameters["elevation"])
 

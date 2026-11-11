@@ -61,7 +61,7 @@ def RunFlight(numOfSims, initial_cpu_time):
 
 
         nose_cone = Sp25.add_nose(
-            length = Parameters["nose_cone_length"], kind = Parameters["nose_cone_type"], position = Parameters["nose_position"])
+            length = Parameters["nose_cone_length"], kind = Parameters["nose_cone_type"], position = 0)
         fin_set = Sp25.add_trapezoidal_fins(n=Parameters["num_fins"], root_chord= Parameters["root_chord"], tip_chord=Parameters["tip_chord"], span=Parameters["fin_span"],
             position = Parameters["fin_position"],cant_angle=Parameters["fin_cant_angle"], sweep_length=Parameters["fin_sweep_length"])
         
