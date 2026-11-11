@@ -1,0 +1,3 @@
+
+{'out_of_rail_time': 0.22595974995156126, 'out_of_rail_velocity': np.float64(23.657116539461228), 'max_velocity': np.float64(352.984297306242), 'apogee_time': np.float64(23.46108672995458), 'apogee_altitude': np.float64(3307.332483453145), 'apogee_x': np.float64(-536.3824397881999), 'apogee_y': np.float64(-306.1126150119199), 'initial_static_margin': np.float64(2.2727380757691464), 'out_of_rail_static_margin': np.float64(2.3145922174343148), 'out_of_rail_stability_margin': np.float64(2.316130649210838), 'execution_time': 1.09375, 'impact_x': np.float64(-555.4750643946487), 'impact_y': np.float64(-317.2929137920884)}
+Completed sim successfully. Total CPU time: 1.09375 s. Total wall time: 1.0724329948425293 s

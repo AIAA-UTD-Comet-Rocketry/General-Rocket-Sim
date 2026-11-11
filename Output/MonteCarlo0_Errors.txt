@@ -1,0 +1,2 @@
+
+Completed sim successfully. Total CPU time: 1.09375 s. Total wall time: 1.0724329948425293 s

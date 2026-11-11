@@ -53,8 +53,8 @@ Parameters["env_file"] = None
 
 Parameters["fahrenheit_temp"] = 67
 Parameters["pressure"] = None
-Parameters["wind_u"] = 1.25
-Parameters["wind_v"] = 1.25
+Parameters["wind_u"] = 1.5
+Parameters["wind_v"] = 1.5
 
 # (year, month, day, hour)
 
@@ -89,8 +89,8 @@ Parameters["rocket_mass"] = 14.953
 Parameters["rocket_radius"] = 0.154686/2
 Parameters["rocket_length"] = 3.08
 Parameters["center_of_mass_without_motor"] = 1.62
-Parameters["power_off_file"] = "2026LSCCDOFF.csv"
-Parameters["power_on_file"] = "2026LSCCDON.csv"
+Parameters["power_off_file"] = "2026IrecCdOff.csv"
+Parameters["power_on_file"] = "2026IrecCdOn.csv"
 
 #nose cone
 Parameters["nose_cone_length"] = 0.813
@@ -125,7 +125,7 @@ Parameters["heading"] = 240
 Parameters["rail_length"] = 4.19
 
 #airbrakes
-Parameters["using_airbrakes"] = True
+Parameters["using_airbrakes"] = False
 
 if(Parameters["using_airbrakes"]):
     Parameters["air_brake_drag"] = "../InputFiles/AirbrakeDrag.csv"
