@@ -55,7 +55,7 @@ Parameters["atmosphere_type"] = "custom_atmosphere"
 Parameters["env_file"] = None
 
 Parameters["base_pressure"] = 100440
-Parameters["fahrenheit_temp"] = 80
+Parameters["fahrenheit_temp"] = 90
 Parameters["wind_u"] = 2.5
 Parameters["wind_v"] = 0
 
@@ -176,17 +176,19 @@ else:
 
 
 
-Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2 * 20
-Parameters["rocket_inertia_33"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2 * 20
+Parameters["rocket_inertia_11"] = 10.8
+Parameters["rocket_inertia_33"] = 0.60
 
 
 Parameters["total_motor_mass"] = Parameters["motor_dry_mass"] + Parameters["propellant_mass"]
 Parameters["motor_length"] = Parameters["grain_height"] * Parameters["num_grains"]
 # area = pi * r^2 * height
 Parameters["motor_volume"] = (((np.pi * Parameters["grain_outer_radius"] ** 2) - (np.pi * Parameters["grain_inner_radius"] ** 2)) * Parameters["motor_length"])
-Parameters["motor_inertia_11"] = (1/12)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2 * 5
+#Parameters["motor_inertia_11"] = (1/12)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2
+Parameters["motor_inertia_11"] = 0.6
 Parameters["motor_density"] = Parameters["propellant_mass"]/Parameters["motor_volume"]
-Parameters["motor_inertia_33"] = ((1/4)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2) + (1/12)*Parameters["motor_dry_mass"]*(Parameters["motor_length"])**2 * 5
+#Parameters["motor_inertia_33"] = ((1/4)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2) + (1/12)*Parameters["motor_dry_mass"]*(Parameters["motor_length"])**2
+Parameters["motor_inertia_33"] = 0.008
 Parameters["the_motor_center_of_dry_mass_position"] = Parameters["motor_position"]
 
 _, _, points = motor.Motor.import_eng("../InputFiles/" + Parameters["motor_thrust_file"])
