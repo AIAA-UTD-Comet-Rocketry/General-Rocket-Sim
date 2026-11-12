@@ -17,7 +17,7 @@ def RunFlight(numOfSims, initial_cpu_time):
 
     
     env = Environment(latitude=Parameters["latitude"], longitude=Parameters["longitude"], elevation=Parameters["elevation"], date=[*Parameters["day"], int(Parameters["hour"])])
-    env.set_atmospheric_model(type=Parameters["atmosphere_type"], file=Parameters["env_file"], wind_u=Parameters["wind_u"], wind_v=Parameters["wind_v"], pressure=Parameters["pressure"])
+    env.set_atmospheric_model(type=Parameters["atmosphere_type"], file=Parameters["env_file"], wind_u=Parameters["wind_u"], wind_v=Parameters["wind_v"], pressure=Parameters["pressure"], temperature = Parameters["temperature"])
     i=0
 
     if not Parameters["doing_monte_carlo"]:

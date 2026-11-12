@@ -1,3 +1,4 @@
+import math
 from datetime import date, timedelta
 import logging
 
@@ -47,22 +48,20 @@ Parameters["elevation"] = returnedData["elevation"]
 '''
 Parameters["elevation"] = 900
 
+def calcKelvinfromFahrenheit(fTemp):
+    return (fTemp - 32) * 5/9 + 273.15
+
 Parameters["atmosphere_type"] = "custom_atmosphere"
 Parameters["env_file"] = None
 
-Parameters["pressure"] = None
-Parameters["fahrenheit_temp"] = 100
+Parameters["base_pressure"] = 100440
+Parameters["fahrenheit_temp"] = 80
 Parameters["wind_u"] = 2.5
 Parameters["wind_v"] = 0
 
 # (year, month, day, hour)
 
 Parameters["fetch_weather_data"] = False
-
-if(Parameters["atmosphere_type"] == "custom_atmosphere" and Parameters["fetch_weather_data"]):
-    Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
-
-
 
 Parameters["generated_files_location"] = "../Output/"
 
@@ -177,17 +176,17 @@ else:
 
 
 
-Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2 * 10
-Parameters["rocket_inertia_33"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2 * 10
+Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2 * 20
+Parameters["rocket_inertia_33"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2 * 20
 
 
 Parameters["total_motor_mass"] = Parameters["motor_dry_mass"] + Parameters["propellant_mass"]
 Parameters["motor_length"] = Parameters["grain_height"] * Parameters["num_grains"]
 # area = pi * r^2 * height
 Parameters["motor_volume"] = (((np.pi * Parameters["grain_outer_radius"] ** 2) - (np.pi * Parameters["grain_inner_radius"] ** 2)) * Parameters["motor_length"])
-Parameters["motor_inertia_11"] = (1/12)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2
+Parameters["motor_inertia_11"] = (1/12)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2 * 5
 Parameters["motor_density"] = Parameters["propellant_mass"]/Parameters["motor_volume"]
-Parameters["motor_inertia_33"] = ((1/4)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2) + (1/12)*Parameters["motor_dry_mass"]*(Parameters["motor_length"])**2
+Parameters["motor_inertia_33"] = ((1/4)*Parameters["motor_dry_mass"]*(Parameters["grain_outer_radius"])**2) + (1/12)*Parameters["motor_dry_mass"]*(Parameters["motor_length"])**2 * 5
 Parameters["the_motor_center_of_dry_mass_position"] = Parameters["motor_position"]
 
 _, _, points = motor.Motor.import_eng("../InputFiles/" + Parameters["motor_thrust_file"])
@@ -200,9 +199,8 @@ Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
 
 print(f"Impulse is: {Parameters['impulse']}")
 
-
-def calcKelvinfromFahrenheit(fTemp):
-    return (fTemp - 32) * 5/9 + 273.15
+if(Parameters["atmosphere_type"] == "custom_atmosphere" and Parameters["fetch_weather_data"]):
+    Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
 
 newTempArr = []
 if isinstance(Parameters["fahrenheit_temp"], float) or isinstance(Parameters["fahrenheit_temp"], int):
@@ -211,6 +209,29 @@ else:
     for i in range(0, len(Parameters["fahrenheit_temp"]), 1):
         newTempArr.append((Parameters["fahrenheit_temp"][i][0], calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"][i][1])))
     Parameters["temperature"] = newTempArr
+
+if(not Parameters["fetch_weather_data"]):
+    def temperature_function(height):
+        L = 0.0065
+        h0 = Parameters["elevation"]
+        T0 = calcKelvinfromFahrenheit(Parameters["fahrenheit_temp"])
+
+        return T0 - L * (height - h0)
+    
+    def pressure_function(height):
+        h0 = Parameters["elevation"]
+        p0 = Parameters["base_pressure"]
+        g = 9.8
+        M = 0.0289644
+        R = 8.31446
+        T = temperature_function(height)
+
+        return p0 * math.exp((-g*M*(height - h0)) /(R*T))
+
+
+    Parameters["pressure"] = pressure_function
+    Parameters["temperature"] = temperature_function
+
 
 Parameters["monte_carlo"] = MonteCarloManager(Parameters, Parameters["doing_monte_carlo"])
 
