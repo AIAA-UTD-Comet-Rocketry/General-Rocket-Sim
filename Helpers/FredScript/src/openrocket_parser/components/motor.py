@@ -23,7 +23,7 @@ class Motor(XMLComponent):
         return {
             "motor_name": self.designation,
             "motor_diameter": self.diameter,
-            "motorLength": self.length
+            "motor_length": self.length
 
         }
 

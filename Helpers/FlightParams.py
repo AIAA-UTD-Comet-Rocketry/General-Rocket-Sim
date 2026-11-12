@@ -45,7 +45,7 @@ print(returnedData["elevation"])
 
 Parameters["elevation"] = returnedData["elevation"]
 '''
-Parameters["elevation"] = 750
+Parameters["elevation"] = 914
 
 Parameters["atmosphere_type"] = "standard_atmosphere"
 Parameters["env_file"] = None
@@ -121,7 +121,7 @@ Parameters["railbutton_angular_position"] = 150
 
 #final rocket stuff
 Parameters["inclination"] = 84
-Parameters["heading"] = 240
+Parameters["heading"] = 90
 Parameters["rail_length"] = 4.19
 
 #airbrakes
@@ -177,8 +177,8 @@ else:
 
 
 
-Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2
-Parameters["rocket_inertia_33"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2
+Parameters["rocket_inertia_11"] = Parameters["rocket_radius"] * 2 * 10
+Parameters["rocket_inertia_33"] = (Parameters["rocket_radius"]**2)*Parameters["rocket_mass"]*1/2 * 10
 
 
 Parameters["total_motor_mass"] = Parameters["motor_dry_mass"] + Parameters["propellant_mass"]
