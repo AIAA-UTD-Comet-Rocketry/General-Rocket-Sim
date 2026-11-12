@@ -45,22 +45,22 @@ print(returnedData["elevation"])
 
 Parameters["elevation"] = returnedData["elevation"]
 '''
-Parameters["elevation"] = 914
+Parameters["elevation"] = 900
 
-Parameters["atmosphere_type"] = "standard_atmosphere"
+Parameters["atmosphere_type"] = "custom_atmosphere"
 Parameters["env_file"] = None
 
-
-Parameters["fahrenheit_temp"] = 67
 Parameters["pressure"] = None
-Parameters["wind_u"] = 1.5
-Parameters["wind_v"] = 1.5
+Parameters["fahrenheit_temp"] = 100
+Parameters["wind_u"] = 2.5
+Parameters["wind_v"] = 0
 
 # (year, month, day, hour)
 
-if(Parameters["atmosphere_type"] == "custom_atmosphere"):
-    Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
+Parameters["fetch_weather_data"] = False
 
+if(Parameters["atmosphere_type"] == "custom_atmosphere" and Parameters["fetch_weather_data"]):
+    Parameters["pressure"], Parameters["fahrenheit_temp"], Parameters["wind_u"], Parameters["wind_v"] = GetWeatherData(Parameters["date"], Parameters["latitude"], Parameters["longitude"])
 
 
 
@@ -121,7 +121,7 @@ Parameters["railbutton_angular_position"] = 150
 
 #final rocket stuff
 Parameters["inclination"] = 84
-Parameters["heading"] = 90
+Parameters["heading"] = 270
 Parameters["rail_length"] = 4.19
 
 #airbrakes
@@ -199,8 +199,6 @@ thrust = Function(points, "Time (s)", "Thrust (N)", interpolation_method, "zero"
 Parameters["impulse"] = thrust.integral(0, Parameters["burn_time"])
 
 print(f"Impulse is: {Parameters['impulse']}")
-
-Parameters["atmosphere_pressure"] = env.pressure_ISA(Parameters["elevation"])
 
 
 def calcKelvinfromFahrenheit(fTemp):
