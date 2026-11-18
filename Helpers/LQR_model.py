@@ -62,18 +62,18 @@ class LQR(Airbrake):
     # creating a class to set the state space with
     def creating_state_space(A, B, C, D=None):
         # our system matrices
-        A = np.asarray(A, dtype=float) # system
-        B = np.asarray(B, dtype=float) # input
-        C = np.asarray(C, dtype=float) # output
+        A = np.asarray(A, dtype=float)  # system
+        B = np.asarray(B, dtype=float)  # input
+        C = np.asarray(C, dtype=float)  # output
 
         if D is None:
-            D = np.zeros((C.shape[0], B.shape[1])) # feed through
+            D = np.zeros((C.shape[0], B.shape[1]))  # feed through
 
         D = np.asarray(D, dtype=float)
 
         # re-defining state space model
         # sys_state_space = ct.ss(A, B, C, D)
-        return ct.ss(A, B, C, D) # sys_state_space
+        return ct.ss(A, B, C, D)  # sys_state_space
 
     sys_state_space = creating_state_space(A, B, C)
 
@@ -125,7 +125,7 @@ class LQR(Airbrake):
                   str_y_axis='Position [m]',
                   str_file_name='../OpenLoopResponse1.png')
     # here we can see how an output of a simulation with a constant force of one (F),
-    # it will ocilate until done, but we need ours much much faster
+    # it will ocilate until done, but we need ours much faster
 
     # our velocity over time
     plotting_func(return_sim.time,
@@ -155,7 +155,8 @@ class LQR(Airbrake):
     matrix1 = np.matmul(np.linalg.inv(np.matmul(B.T, B)), B.T)
     matrix2 = np.matmul(matrix1, A)
 
-    ud = np.matmul(matrix2, xd)
+    # ud = np.matmul(matrix2, xd)
+    ud = -np.linalg.pinv(B) @ A @ xd  #
     time_vector = np.linspace(start_time, end_time, number_samples)
 
     control_input_vector = ud[0, 0] * np.ones(number_samples)
@@ -194,7 +195,7 @@ class LQR(Airbrake):
     ###
     # in short a brief comment for my own understanding is that  LQR,
     # L (linear) is that we assume the system can be
-    # represented in a linear state space : x = Ax + Bu
+    # represented in a linear state space : x = Ax + Bu***
     # Q(quadratic): evaluates our performance using a quadratic cost function J:
     # J = ∫₀∞ [ xᵀ Q x + uᵀ R u ] dt
     # R(regulator) continuously pushes our system errors back to 0 or a point of reference x reference
@@ -212,9 +213,11 @@ class LQR(Airbrake):
     # u = -Kx -> u = -K (x current - x reference)  ->optimal controller
     # -K is our feedback control matrix (gain matrix)
     K, S, E = ct.lqr(sys_state_space, Q, R)
+
     # S being solution to riccati as stated bellow,
     # E is our closed loop eigen values
-    print(K, S, E)
+    # print(K, S, E)
+
     ## decomposing our aerodynamics in absolute coordinates
     # using dotted curly *~x = (A-BK) ~x )which A-BK will be asymptomatically stable
     # eigen values being to the left half of complex plane
@@ -222,13 +225,16 @@ class LQR(Airbrake):
     # so x becomes xd : dotted x = (A-BK)x-(A-BK)xd <--closed loop system simulation
     #                               Acl     Bcl
     Acl = A - np.matmul(B, K)  # Acl = A - BK
-    Bcl = -Acl  # Bcl = -(A - BK)
-    Dcl = Dcl = np.array([[0, 0]])  # our x = Ax + Bu -> y = Cx + Du
+    Bcl = np.matmul(B, K)  # Bcl = -(A - BK)
+    # Dcl = np.array([[0, 0]])  # our x = Ax + Bu -> y = Cx + Du
+    Dcl = np.zeros((C.shape[0], xd.shape[0]))
+
     # defining our new state space
-    sys_state_space_cl = ct.ss(Acl, Bcl, C, Dcl)  # which has our state equation
+    sys_state_space_cl = creating_state_space(Acl, Bcl, C, Dcl)  # which has our state equation
 
     # defining time vectors for our simulation
     time_vector = np.linspace(start_time, end_time, number_samples)
+
     # now we are defining our input vectors for closed loop sim
     input_cl = np.zeros(shape=(2, number_samples))
     input_cl[0, :] = xd[0, 0] * np.ones(number_samples)
@@ -250,3 +256,78 @@ class LQR(Airbrake):
                   str_x_axis='Time [s]',
                   str_y_axis='Velocity [m/s]',
                   str_file_name='../OpenLoopResponse2.png')  # second state
+
+    # adding the flight simulator
+
+    def airbrake_controller_function(self, time, sampling_rate, state, state_history, observed_variables, air_brakes,
+                                     sensors, env):
+        canDeployAirbrake = False
+
+        # deployment_time = air_brakes.airbrake_deploy_time
+
+        # state = [x, y, z, vx, vy, vz, e0, e1, e2, e3, wx, wy, wz]
+        altitude_ASL = state[2]
+        above_ground_altitude = altitude_ASL - env.elevation
+        vx, vy, vz = state[3], state[4], state[5]
+        e0, e1, e2, e3 = state[6], state[7], state[8], state[9]
+
+        # print(f"E0: {e0}, E1: {e1}, E2: {e2}, E3: {e3}")
+
+        # Get winds in x and y directions
+        wind_x, wind_y = env.wind_velocity_x(altitude_ASL), env.wind_velocity_y(altitude_ASL)
+
+        y_velocity = abs(vy - wind_y)
+
+        # Calculate Mach number, by first getting entire speed
+        free_stream_speed = (
+                                    (wind_x - vx) ** 2 + (wind_y - vy) ** 2 + (vz) ** 2
+                            ) ** 0.5
+        mach_number = free_stream_speed / env.speed_of_sound(altitude_ASL)
+
+        # Get previous state from state_history
+        previous_state = state_history[-1]
+        previous_vz = previous_state[5]
+
+        # If we wanted to we could get the returned values from observed_variables:
+        # returned_time, deployment_level, drag_coefficient = observed_variables[-1]
+
+        # Example quaternion in (w, x, y, z)
+        pitch = self.getPitch(np.array([e0, e1, e2, e3]))  # ~15° rotation around Y
+
+        # print("Angle from flat plane (deg):", pitch)
+
+        # ALTITUDES IS COLUMN, VELCOITIES IS ROWS
+
+        # gets closest index to this angle
+        angleIndex = self.binarySearch(self.angleVals, pitch, 0, self.numAngles - 1)
+        velocityIndex = self.binarySearch(self.velocityVals, vz, 0, self.numVelPoints - 1)
+        altitudeIndex = self.binarySearch(self.altitudeVals, above_ground_altitude, 0, self.numAltPoints - 1)
+
+        altitudeIndex = len(self.altitudeVals) - altitudeIndex - 1
+        angleIndex = len(self.angleVals) - angleIndex - 1
+
+        # print(f"The goddamn altitude: {above_ground_altitude}")
+        # print(f"The altitude index is: {altitudeIndex}, while the number of altitudes is {len(self.altitudeVals)}")
+        # print(f"The velocity index is: {velocityIndex}, while the number of altitudes is {len(self.velocityVals)}")
+        # print(altitudeVals)
+
+        # print(f"row value we're getting is {angleIndex * numVelPoints + velocityIndex}, and column value is {altitudeIndex}")
+
+        # should be good
+        deploymentLevel = self.table.iloc[angleIndex * self.numVelPoints + velocityIndex][altitudeIndex] / 127.0
+
+        # print(f"Our aaltitude was {above_ground_altitude}, our velocity Y was {vz}, our angle was {pitch}")
+
+        # Check if the rocket has reached burnout
+        if (vz > 0 and time > self.burnoutTime):
+            air_brakes.deployment_level = deploymentLevel
+            canDeployAirbrake = True
+            # print(f"WE CAN DEPLOY! Deployment level is {air_brakes.deployment_level}. Also, time is {time}, row value we're getting is {angleIndex * self.numVelPoints + velocityIndex}, and column value is {altitudeIndex}, as \
+            #     angle value is {angleIndex} and velocity index is {velocityIndex}")
+
+        return (
+            "airbrake" + str(canDeployAirbrake),
+            time,
+            air_brakes.deployment_level,
+            air_brakes.drag_coefficient(air_brakes.deployment_level, mach_number),
+        )
